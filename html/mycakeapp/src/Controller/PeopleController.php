@@ -11,28 +11,29 @@ class PeopleController extends AppController
     {
         if ($this->request->is('post')) {
             $find = $this->request->data['People']['find'];
-            $condition = ['limit' => 3, 'page' => $find];
-            $data = $this->People->find('all', $condition);
+            $data = $this->People->find('me', ['me' => $find])
+                ->contain(['Messages']);
         } else {
-            $data = $this->People->find('all');
+            $data = $this->People->find('byAge')
+                ->contain(['Messages']);
         }
         $this->set('data', $data);
     }
 
     public function add()
     {
+        $msg = 'please type your personal data...';
         $entity = $this->People->newEntity();
-        $this->set('entity', $entity);
-    }
-
-    public function create()
-    {
         if ($this->request->is('post')) {
-            $data = $this->request->data['People'];
+            $data =  $this->request->data['People'];
             $entity = $this->People->newEntity($data);
-            $this->People->save($entity);
+            if ($this->People->save($entity)) {
+                return $this->redirect(['action' => 'index']);
+            }
+            $msg = 'Error was occured...';
         }
-        return $this->redirect(['action' => 'index']);
+        $this->set('msg', $msg);
+        $this->set('entity', $entity);
     }
 
     public function edit()
