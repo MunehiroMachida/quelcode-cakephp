@@ -23,7 +23,6 @@ class PeopleTable extends Table
             ->orWhere(['mail like' => '%' . $me . '%'])
             ->order(['age' => 'asc']);
     }
-
     public function findByAge(Query $query, array $options)
     {
         return $query->order(['age' => 'asc'])->order(['name' => 'asc']);
