@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Controller;
@@ -44,7 +43,7 @@ class AuctionBaseController extends AppController
     function login()
     {
         // POST時の処理
-        if ($this->request->isPost()) {
+        if ($this->request->is('post')) {
             $user = $this->Auth->identify();
             // Authのidentifyをユーザーに設定
             if (!empty($user)) {
