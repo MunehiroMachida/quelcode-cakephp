@@ -1,4 +1,5 @@
 <?php
+
 use Migrations\AbstractMigration;
 
 class CreateBiditems extends AbstractMigration
@@ -27,7 +28,7 @@ class CreateBiditems extends AbstractMigration
             'default' => null,
             'null' => false,
         ]);
-        $table->addColumn('endgame', 'datetime', [
+        $table->addColumn('endtime', 'datetime', [
             'default' => null,
             'null' => false,
         ]);

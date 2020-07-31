@@ -79,9 +79,9 @@ class BiditemsTable extends Table
             ->notEmptyString('finished');
 
         $validator
-            ->dateTime('endgame')
-            ->requirePresence('endgame', 'create')
-            ->notEmptyDateTime('endgame');
+            ->dateTime('endtime')
+            ->requirePresence('endtime', 'create')
+            ->notEmptyDateTime('endtime');
 
         return $validator;
     }

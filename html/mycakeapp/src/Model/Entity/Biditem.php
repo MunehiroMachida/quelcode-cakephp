@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
@@ -10,7 +11,7 @@ use Cake\ORM\Entity;
  * @property int $user_id
  * @property string $name
  * @property bool $finished
- * @property \Cake\I18n\Time $endgame
+ * @property \Cake\I18n\Time $endtime
  * @property \Cake\I18n\Time $created
  *
  * @property \App\Model\Entity\User $user
@@ -32,7 +33,7 @@ class Biditem extends Entity
         'user_id' => true,
         'name' => true,
         'finished' => true,
-        'endgame' => true,
+        'endtime' => true,
         'created' => true,
         'user' => true,
         'bidinfo' => true,
