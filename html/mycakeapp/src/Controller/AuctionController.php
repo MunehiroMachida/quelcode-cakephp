@@ -92,8 +92,9 @@ class AuctionController extends AuctionBaseController
 		$file = $this->request->getData('image_path');
 		$imagepath_3 = substr($file['name'], -3);
 		$imagepath_4 = substr($file['name'], -4);
-		$image_last_3 = ($imagepath_3 === 'jpg' || $imagepath_3 === 'JPG' || $imagepath_3 === 'png' || $imagepath_3 === 'PNG' || $imagepath_3 === 'gif' ||  $imagepath_3 === 'GIF');
-		$image_last_4 = ($imagepath_4 === 'jpeg' || $imagepath_4 === 'JPEG');
+
+		$image_last_3 = in_array($imagepath_3, ['jpg', 'JPG', 'png', 'PNG', 'gif', 'GIF',]);
+		$image_last_4 = in_array($imagepath_4, ['jpeg', 'JPEG',]);
 		$biditem_last_id = $this->Biditems->find('all')->last();
 
 		if ($image_last_3 || $image_last_4) {
