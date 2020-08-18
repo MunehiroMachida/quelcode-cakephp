@@ -129,7 +129,7 @@ class AuctionController extends AuctionBaseController
 				// 失敗時のメッセージ
 				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 			}
-		} else {
+		} elseif(!empty($this->request->getData())) {
 			$this->Flash->error(__('画像ファイルを確認して、もう一度入力下さい。'));
 		}
 		// 値を保管
