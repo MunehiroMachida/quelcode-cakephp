@@ -2,11 +2,9 @@
 // https://qiita.com/piesuke0727/items/91333b9a1ba8fe051be2
 
 var endDate = new Date(endtime_JS);
-var interval = 1000;
-
+var nowDate = new Date(hensuJS);
 
 function countdownTimer() {
-    var nowDate = new Date();
     var period = endDate - nowDate;
     var addZero = function (n) { return ('0' + n).slice(-2); }
     var addZeroDay = function (n) { return ('0' + n).slice(-3); }
@@ -24,7 +22,8 @@ function countdownTimer() {
         insert += '<span class="m">' + addZero(minutes) + '分' + '</span>';
         insert += '<span class="s">' + addZero(second) + '秒' + '</span>';
         document.getElementById('result').innerHTML = insert;
-        setTimeout(countdownTimer, 10);
+        setTimeout(countdownTimer, 1000);
+        nowDate -= -1000;
     }
     else {
         var insert = "終了しました";
