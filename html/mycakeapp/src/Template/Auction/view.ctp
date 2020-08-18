@@ -29,10 +29,10 @@
 		<td id='result' style="font-weight:bold;color:red;">
 			<?php
 			$endtime = get_object_vars($biditem->endtime);
-			$hensuPHP = date("Y/m/d H:i:s");
+			$nowDate_php = date("Y/m/d H:i:s");
 			?>
 			<script>
-				var hensuJS = '<?php echo $hensuPHP; ?>';
+				var nowDate_JS = '<?php echo $nowDate_php; ?>';
 				var endtime_JS = '<?php echo ($endtime['date']); ?>';
 			</script>
 			<?= $this->Html->script('auction') ?>

@@ -2,7 +2,7 @@
 // https://qiita.com/piesuke0727/items/91333b9a1ba8fe051be2
 
 var endDate = new Date(endtime_JS);
-var nowDate = new Date(hensuJS);
+var nowDate = new Date(nowDate_JS);
 
 function countdownTimer() {
     var period = endDate - nowDate;
