@@ -83,6 +83,11 @@ class BiditemsTable extends Table
             ->requirePresence('endtime', 'create')
             ->notEmptyDateTime('endtime');
 
+        $validator
+            ->boolean('is_sent')
+            ->requirePresence('is_sent', 'create')
+            ->notEmptyString('is_sent');
+
         return $validator;
     }
 

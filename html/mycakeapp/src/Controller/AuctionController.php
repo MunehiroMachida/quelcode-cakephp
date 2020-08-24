@@ -22,6 +22,7 @@ class AuctionController extends AuctionBaseController
 		$this->loadModel('Bidrequests');
 		$this->loadModel('Bidinfo');
 		$this->loadModel('Bidmessages');
+		$this->loadModel('BuyerStatus');
 		// ログインしているユーザー情報をauthuserに設定
 		$this->set('authuser', $this->Auth->user());
 		// レイアウトをauctionに変更
@@ -181,4 +182,15 @@ class AuctionController extends AuctionBaseController
 			'limit' => 10])->toArray();
 		$this->set(compact('biditems'));
 	}
+
+
+		// トップページ
+		public function buyerinfo()
+		{
+			// ページネーションでBiditemsを取得
+			$auction = $this->paginate('Biditems', [
+				'order' =>['endtime'=>'desc'], 
+				'limit' => 10]);
+			$this->set(compact('auction'));
+		}
 }
