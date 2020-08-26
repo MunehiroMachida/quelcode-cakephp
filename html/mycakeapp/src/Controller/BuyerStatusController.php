@@ -20,7 +20,7 @@ class BuyerStatusController extends AppController
     public function index()
     {
         $this->paginate = [
-            'contain' => ['Buyers'],
+            'contain' => ['buyerStatus'],
         ];
         $buyerStatus = $this->paginate($this->BuyerStatus);
 

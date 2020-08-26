@@ -184,13 +184,27 @@ class AuctionController extends AuctionBaseController
 	}
 
 
-		// トップページ
+		// 落札者情報
 		public function buyerinfo()
 		{
-			// ページネーションでBiditemsを取得
-			$auction = $this->paginate('Biditems', [
-				'order' =>['endtime'=>'desc'], 
-				'limit' => 10]);
-			$this->set(compact('auction'));
+			// >BuyerStatusインスタンスを用意
+			$buyerstatus = $this->BuyerStatus->newEntity();
+			// POST送信時の処理
+			if ($this->request->is('post')) {
+				// $buyerstatusにフォームの送信内容を反映
+				$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
+				// $buyerstatusを保存する
+				if ($this->BuyerStatus->save($buyerstatus)) {
+					// 成功時のメッセージ
+					$this->Flash->success(__('保存しました。'));
+					// トップページ（index）に移動
+					return $this->redirect(['action' => 'index']);
+				}
+				// 失敗時のメッセージ
+				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
+			}
+			// 値を保管
+			$this->set(compact('buyerstatus'));
 		}
+
 }

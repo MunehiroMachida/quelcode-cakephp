@@ -36,7 +36,7 @@ class BuyerStatusTable extends Table
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
-        $this->belongsTo('Buyers', [
+        $this->belongsTo('Users', [
             'foreignKey' => 'buyer_id',
             'joinType' => 'INNER',
         ]);
@@ -89,7 +89,7 @@ class BuyerStatusTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['buyer_id'], 'Buyers'));
+        $rules->add($rules->existsIn(['buyer_id'], 'Users'));
 
         return $rules;
     }
