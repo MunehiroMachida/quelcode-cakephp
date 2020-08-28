@@ -53,6 +53,9 @@ class BiditemsTable extends Table
         $this->hasMany('Bidrequests', [
             'foreignKey' => 'biditem_id',
         ]);
+        $this->hasMany('BuyerStatus', [
+            'foreignKey' => 'id',
+        ]);
     }
 
     /**

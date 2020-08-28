@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
@@ -32,6 +33,7 @@ class BuyerStatus extends Entity
         'phone_number' => true,
         'address' => true,
         'is_received' => true,
+        'biditem_id' => true,
         'buyer' => true,
     ];
 }

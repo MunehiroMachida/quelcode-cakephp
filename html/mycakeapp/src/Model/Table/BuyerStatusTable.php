@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model\Table;
 
 use Cake\ORM\Query;
@@ -40,6 +41,10 @@ class BuyerStatusTable extends Table
             'foreignKey' => 'buyer_id',
             'joinType' => 'INNER',
         ]);
+        $this->belongsTo('Biditems', [
+            'foreignKey' => 'biditem_id',
+            'joinType' => 'INNER',
+        ]);
     }
 
     /**
@@ -76,6 +81,11 @@ class BuyerStatusTable extends Table
             ->boolean('is_received')
             ->requirePresence('is_received', 'create')
             ->notEmptyString('is_received');
+
+        $validator
+            ->integer('biditem_id')
+            ->requirePresence('biditem_id', 'create')
+            ->notEmptyString('biditem_id');
 
         return $validator;
     }
