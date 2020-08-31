@@ -175,6 +175,15 @@ class AuctionController extends AuctionBaseController
 			'limit' => 10
 		])->toArray();
 		$this->set(compact('bidinfo'));
+
+		if ($this->request->is('post')) {
+			$buyer_status_id = (intval($this->request->getData(['buyer'])));
+			$entity = $this->BuyerStatus->get($buyer_status_id);
+			$this->BuyerStatus->patchEntity($entity, ['is_received' => true]);
+			$this->BuyerStatus->save($entity);
+		}
+		$buyer_status = $this->BuyerStatus->find('all')->toArray();
+		$this->set(compact('buyer_status'));
 	}
 
 	// 出品情報の表示

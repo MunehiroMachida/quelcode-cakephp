@@ -2,7 +2,6 @@
 <?= $this->Form->create($buyerstatus) ?>
 <fieldset>
 	<?php
-	// echo $this->Form->control('buyer_id', ['value' => $bidrequest->biditems_id]);
 	echo $this->Form->hidden('buyer_id', ['value' => $authuser['id']]);
 	echo $this->Form->control('name');
 	echo $this->Form->control('phone_number');
