@@ -462,3 +462,13 @@ meta.foundation-version{font-family:"{{ VERSION }}"}meta.foundation-mq-small{fon
     padding:10px 5px;
     margin:3px;
 }
+
+.sent{
+    /* background-color: thistle; */
+    padding:0;
+}
+.sent button{
+    background-color: yellowgreen;
+    padding:10px 5px;
+    margin:3px;
+}

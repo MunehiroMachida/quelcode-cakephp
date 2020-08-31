@@ -7,6 +7,7 @@
 			<th class="main" scope="col"><?= $this->Paginator->sort('name') ?></th>
 			<th scope="col"><?= $this->Paginator->sort('created') ?></th>
 			<th scope="col" class="actions"><?= __('Actions') ?></th>
+			<th scope="col" class="sent"><?= __('Sent') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -17,14 +18,26 @@
 				<td><?= h($biditem->created) ?></td>
 				<td class="actions">
 					<?php if (!empty($biditem->bidinfo)) : ?>
-						<?= $this->Html->link(__('View'), ['action' => 'msg', $biditem->bidinfo->id]) ?>
+						<?= $this->Html->link(__('落札者とのメッセージ'), ['action' => 'msg', $biditem->bidinfo->id]) ?>
+					<?php endif; ?>
+				</td>
+				<td class="sent">
+					<?php if ($biditem['is_sent'] === false) : ?>
+						<?php
+						echo $this->Form->create(null, ['type' => 'post', 'url' => ['controller' => 'Auction', 'auction' => 'home2']]);
+						echo $this->Form->hidden('item', ['value' => $biditem['id']]);
+						echo $this->Form->button('発送完了');
+						echo $this->Form->end();
+						?>
+					<?php else : ?>
+						<?= h('NULL') ?>
 					<?php endif; ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
 	</tbody>
 </table>
-
+<?php var_dump($biditem['id']) ?>
 <div class="paginator">
 	<ul class="pagination">
 		<?= $this->Paginator->first('<< ' . __('first')) ?>

@@ -197,9 +197,13 @@ class AuctionController extends AuctionBaseController
 			'limit' => 10
 		])->toArray();
 		$this->set(compact('biditems'));
+		if ($this->request->is('post')) {
+			$biditems_id = (intval($this->request->getData(['item'])));
+			$entity = $this->Biditems->get($biditems_id);
+			$this->Biditems->patchEntity($entity, ['is_sent' => true]);
+			$this->Biditems->save($entity);
+		}
 	}
-
-
 	// 落札者情報
 	public function buyerinfo()
 	{
