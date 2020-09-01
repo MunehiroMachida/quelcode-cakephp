@@ -30,14 +30,13 @@
 						echo $this->Form->end();
 						?>
 					<?php else : ?>
-						<?= h('NULL') ?>
+						<?= h('発送完了しました') ?>
 					<?php endif; ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
 	</tbody>
 </table>
-<?php var_dump($biditem['id']) ?>
 <div class="paginator">
 	<ul class="pagination">
 		<?= $this->Paginator->first('<< ' . __('first')) ?>

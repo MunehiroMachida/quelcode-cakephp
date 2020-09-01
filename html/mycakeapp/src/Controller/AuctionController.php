@@ -175,16 +175,32 @@ class AuctionController extends AuctionBaseController
 			'limit' => 10
 		])->toArray();
 		$this->set(compact('bidinfo'));
-
 		if ($this->request->is('post')) {
 			$buyer_status_id = (intval($this->request->getData(['buyer'])));
 			$entity = $this->BuyerStatus->get($buyer_status_id);
 			$this->BuyerStatus->patchEntity($entity, ['is_received' => true]);
 			$this->BuyerStatus->save($entity);
+			if ($this->BuyerStatus->save($entity)) {
+				$bidinfo_array = $this->Bidinfo->find('all')->toArray();
+				$count = count($this->Bidinfo->find('all')->toArray());
+				for ($i = 0; $i <= $count; $i++) {
+					if ($bidinfo_array[$i]['biditem_id'] === $entity["biditem_id"]) {
+						$hoge = $bidinfo_array[$i]['id']; //bidinfoのid
+						break;
+					}
+				}
+				$bidmsg = $this->Bidmessages->newEntity();
+				$hoge = ['bidinfo_id' => $hoge, 'user_id' => $entity["buyer_id"], 'message' => '落札者が商品を受け取りました'];
+				$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $hoge);
+				// Bidmessageに発送完了を保存
+				$this->Bidmessages->save($bidmsg);
+				return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
+			}
 		}
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
 		$this->set(compact('buyer_status'));
 	}
+
 
 	// 出品情報の表示
 	public function home2()
@@ -202,6 +218,23 @@ class AuctionController extends AuctionBaseController
 			$entity = $this->Biditems->get($biditems_id);
 			$this->Biditems->patchEntity($entity, ['is_sent' => true]);
 			$this->Biditems->save($entity);
+
+			if ($this->Biditems->save($entity)) {
+				$bidinfo_array = $this->Bidinfo->find('all')->toArray();
+				$count = count($this->Bidinfo->find('all')->toArray());
+				for ($i = 0; $i <= $count; $i++) {
+					if ($bidinfo_array[$i]['biditem_id'] === $entity["id"]) {
+						$hoge = $bidinfo_array[$i]['id']; //bidinfoのid
+						break;
+					}
+				}
+				$bidmsg = $this->Bidmessages->newEntity();
+				$hoge = ['bidinfo_id' => $hoge, 'user_id' => $entity["user_id"], 'message' => '出品者から商品が発送されました。'];
+				$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $hoge);
+				// Bidmessageに発送完了を保存
+				$this->Bidmessages->save($bidmsg);
+				return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
+			}
 		}
 	}
 	// 落札者情報
@@ -218,7 +251,7 @@ class AuctionController extends AuctionBaseController
 				// 成功時のメッセージ
 				$this->Flash->success(__('保存しました。'));
 				// トップページ（index）に移動
-				return $this->redirect(['action' => 'index']);
+				return $this->redirect(['action' => 'home']);
 			}
 			// 失敗時のメッセージ
 			$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));

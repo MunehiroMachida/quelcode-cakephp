@@ -18,6 +18,7 @@
 				<td><?= h($info->created) ?></td>
 				<td class="actions">
 					<?php
+					error_reporting(0);
 					$count = count($buyer_status);
 					for ($i = 0; $i <= $count; $i++) {
 						if ($buyer_status[$i]['biditem_id'] === $info->biditem->id) {
@@ -25,6 +26,8 @@
 							$information = true;
 							$is_received = $buyer_status[$i]['is_received'];
 							break;
+						} else {
+							$information = false;
 						}
 					}
 					?>
@@ -35,20 +38,22 @@
 					<?php endif; ?>
 				</td>
 				<td class="received">
-					<?php if ($is_received === false) : ?>
+					<?php if ($information === true && $is_received === false) : ?>
 						<?php
 						echo $this->Form->create(null, ['type' => 'post', 'url' => ['controller' => 'Auction', 'auction' => 'home']]);
 						echo $this->Form->hidden('buyer', ['value' => $buyer_status[$i]['id']]);
 						echo $this->Form->button('受け取り完了');
 						echo $this->Form->end();
 						?>
+					<?php elseif ($information === false && empty($is_received)) : ?>
+						<?= h('お届け先を入力してください') ?>
 					<?php else : ?>
 						<?= h('受け取り完了しました') ?>
 					<?php endif; ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
-		<!-- <?php var_dump($is_received); ?> -->
+
 
 	</tbody>
 </table>
