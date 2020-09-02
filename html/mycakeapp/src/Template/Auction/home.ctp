@@ -25,9 +25,20 @@
 							// informationは落札情報が入力されているか。
 							$information = true;
 							$is_received = $buyer_status[$i]['is_received'];
+							$buyer_status_id = $buyer_status[$i]['id'];
+							$buyer_status_biditem_id = $buyer_status[$i]['biditem_id'];
+							$buyer_id = $buyer_status[$i]['buyer_id'];
 							break;
 						} else {
 							$information = false;
+						}
+					}
+					for ($j = 0; $j <= count($ratings); $j++) {
+						if (($ratings[$j]['biditem_id'] === $buyer_status_biditem_id) && ($ratings[$j]['rater'] === $buyer_id)) {
+							$is_ratings = true;
+							break;
+						} else {
+							$is_ratings = false;
 						}
 					}
 					?>
@@ -47,15 +58,16 @@
 						?>
 					<?php elseif ($information === false && empty($is_received)) : ?>
 						<?= h('お届け先を入力してください') ?>
+					<?php elseif ($is_ratings === true) : ?>
+						<?= h('評価しました') ?>
 					<?php else : ?>
-						<?= $this->Html->link(__('評価する'), ['action' => '../Ratings/add', 'biditem_id' => $buyer_status[$i]['id'], 'target' => $info->biditem['user_id'], 'rater' => $buyer_status[$i]['buyer_id']]) ?>
+						<?= $this->Html->link(__('評価する'), ['action' => '../Ratings/add', 'biditem_id' => $buyer_status_id, 'target' => $info->biditem['user_id'], 'rater' => $buyer_id]) ?>
 					<?php endif; ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
 	</tbody>
 </table>
-
 <div class="paginator">
 	<ul class="pagination">
 		<?= $this->Paginator->first('<< ' . __('first')) ?>

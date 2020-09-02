@@ -24,6 +24,7 @@ class AuctionController extends AuctionBaseController
 		$this->loadModel('Bidinfo');
 		$this->loadModel('Bidmessages');
 		$this->loadModel('BuyerStatus');
+		$this->loadModel('Ratings');
 		// ログインしているユーザー情報をauthuserに設定
 		$this->set('authuser', $this->Auth->user());
 		// レイアウトをauctionに変更
@@ -198,7 +199,9 @@ class AuctionController extends AuctionBaseController
 			}
 		}
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
-		$this->set(compact('buyer_status'));
+		$ratings = $this->Ratings->find('all')->toArray();
+		// var_dump($ratings);
+		$this->set(compact('buyer_status', 'ratings'));
 	}
 
 
@@ -259,4 +262,10 @@ class AuctionController extends AuctionBaseController
 		// 値を保管
 		$this->set(compact('buyerstatus'));
 	}
+
+
+	// public function add_r()
+	// {
+	// 	return $this->redirect(['action' => 'index']);
+	// }
 }
