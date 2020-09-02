@@ -203,7 +203,6 @@ class AuctionController extends AuctionBaseController
 		$this->set(compact('buyer_status', 'ratings'));
 	}
 
-
 	// 出品情報の表示
 	public function home2()
 	{
@@ -215,7 +214,6 @@ class AuctionController extends AuctionBaseController
 			'limit' => 10
 		])->toArray();
 		$this->set(compact('biditems'));
-
 
 		if ($this->request->is('post')) {
 			$biditems_id = (intval($this->request->getData(['item'])));
@@ -267,8 +265,17 @@ class AuctionController extends AuctionBaseController
 	}
 
 
-	// public function add_r()
-	// {
-	// 	return $this->redirect(['action' => 'index']);
-	// }
+	public function rating()
+	{
+		// 自分が出品したBiditemをページネーションで取得
+		$ratings = $this->paginate('Ratings', [
+			'conditions' => ['Ratings.target' => $this->Auth->user('id')],
+			'contain' => ['Users'],
+			'order' => ['created' => 'desc'],
+			'limit' => 10
+		])->toArray();
+		// $this->set(compact('biditems'));
+		// $ratings = $this->Ratings;
+		$this->set(compact('ratings'));
+	}
 }

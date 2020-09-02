@@ -45,14 +45,10 @@ class RatingsTable extends Table
             'foreignKey' => 'biditem_id',
             'joinType' => 'INNER',
         ]);
-        // $this->belongsTo('Biditems', [
-        //     'foreignKey' => 'target',
-        //     'joinType' => 'INNER',
-        // ]);
-        // $this->belongsTo('Bidinfo', [
-        //     'foreignKey' => 'rater',
-        //     'joinType' => 'INNER',
-        // ]);
+        $this->belongsTo('Users', [
+            'foreignKey' => 'rater',
+            'joinType' => 'INNER',
+        ]);
     }
 
     /**
