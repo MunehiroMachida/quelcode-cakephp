@@ -267,15 +267,22 @@ class AuctionController extends AuctionBaseController
 
 	public function rating()
 	{
-		// 自分が出品したBiditemをページネーションで取得
+		// 自分が出品したRatingsをページネーションで取得
 		$ratings = $this->paginate('Ratings', [
 			'conditions' => ['Ratings.target' => $this->Auth->user('id')],
 			'contain' => ['Users'],
 			'order' => ['created' => 'desc'],
 			'limit' => 10
 		])->toArray();
-		// $this->set(compact('biditems'));
-		// $ratings = $this->Ratings;
-		$this->set(compact('ratings'));
+
+		$sum = 0;
+		for ($i = 0; $i < count($ratings); $i++) {
+			if (is_int($ratings[$i]['score'])) {
+				$sum += $ratings[$i]['score'];
+			}
+		}
+		$avg = $sum / count($ratings);
+		$avg = round($avg, 1);
+		$this->set(compact('ratings', 'avg'));
 	}
 }

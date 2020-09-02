@@ -1,4 +1,5 @@
 <h2><?= $authuser['username'] ?> の評価一覧</h2>
+<h3>平均評価数は<?= $avg ?>です</h3>
 <table cellpadding="0" cellspacing="0">
     <thead>
         <tr>
