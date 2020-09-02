@@ -41,6 +41,7 @@
 							$is_ratings = false;
 						}
 					}
+					$is_sent = $info->biditem->is_sent;
 					?>
 					<?php if ($information === true) : ?>
 						<?= $this->Html->link(__('メッセージ'), ['action' => 'msg', $info->id]) ?>
@@ -49,19 +50,21 @@
 					<?php endif; ?>
 				</td>
 				<td class="received">
-					<?php if ($information === true && $is_received === false) : ?>
+					<?php if ($information === true && $is_received === false && $is_sent === true) : ?>
 						<?php
 						echo $this->Form->create(null, ['type' => 'post', 'url' => ['controller' => 'Auction', 'auction' => 'home']]);
 						echo $this->Form->hidden('buyer', ['value' => $buyer_status[$i]['id']]);
 						echo $this->Form->button('受け取り完了');
 						echo $this->Form->end();
 						?>
+					<?php elseif ($information === true && $is_received === false && $is_sent === false) : ?>
+						<?= h('商品が発送されるまでお待ちください') ?>
 					<?php elseif ($information === false && empty($is_received)) : ?>
 						<?= h('お届け先を入力してください') ?>
 					<?php elseif ($is_ratings === true) : ?>
 						<?= h('評価しました') ?>
 					<?php else : ?>
-						<?= $this->Html->link(__('評価する'), ['action' => '../Ratings/add', 'biditem_id' => $buyer_status_id, 'target' => $info->biditem['user_id'], 'rater' => $buyer_id]) ?>
+						<?= $this->Html->link(__('評価する'), ['action' => '../Ratings/add', 'biditem_id' => $buyer_status_biditem_id, 'target' => $info->biditem['user_id'], 'rater' => $buyer_id]) ?>
 					<?php endif; ?>
 				</td>
 			</tr>

@@ -200,7 +200,6 @@ class AuctionController extends AuctionBaseController
 		}
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
 		$ratings = $this->Ratings->find('all')->toArray();
-		// var_dump($ratings);
 		$this->set(compact('buyer_status', 'ratings'));
 	}
 
@@ -216,12 +215,13 @@ class AuctionController extends AuctionBaseController
 			'limit' => 10
 		])->toArray();
 		$this->set(compact('biditems'));
+
+
 		if ($this->request->is('post')) {
 			$biditems_id = (intval($this->request->getData(['item'])));
 			$entity = $this->Biditems->get($biditems_id);
 			$this->Biditems->patchEntity($entity, ['is_sent' => true]);
 			$this->Biditems->save($entity);
-
 			if ($this->Biditems->save($entity)) {
 				$bidinfo_array = $this->Bidinfo->find('all')->toArray();
 				$count = count($this->Bidinfo->find('all')->toArray());
@@ -239,6 +239,9 @@ class AuctionController extends AuctionBaseController
 				return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
 			}
 		}
+		$ratings = $this->Ratings->find('all')->toArray();
+		$buyer_status = $this->BuyerStatus->find('all')->toArray();
+		$this->set(compact('ratings', 'buyer_status'));
 	}
 	// 落札者情報
 	public function buyerinfo()
