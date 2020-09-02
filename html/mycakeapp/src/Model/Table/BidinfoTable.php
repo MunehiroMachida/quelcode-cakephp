@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model\Table;
 
 use Cake\ORM\Query;
@@ -52,6 +53,9 @@ class BidinfoTable extends Table
         ]);
         $this->hasMany('Bidmessages', [
             'foreignKey' => 'bidinfo_id',
+        ]);
+        $this->hasMany('Ratings', [
+            'foreignKey' => 'user_id',
         ]);
     }
 

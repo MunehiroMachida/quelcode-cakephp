@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model\Table;
 
 use Cake\ORM\Query;
@@ -44,6 +45,14 @@ class RatingsTable extends Table
             'foreignKey' => 'biditem_id',
             'joinType' => 'INNER',
         ]);
+        // $this->belongsTo('Biditems', [
+        //     'foreignKey' => 'target',
+        //     'joinType' => 'INNER',
+        // ]);
+        // $this->belongsTo('Bidinfo', [
+        //     'foreignKey' => 'rater',
+        //     'joinType' => 'INNER',
+        // ]);
     }
 
     /**
@@ -58,10 +67,10 @@ class RatingsTable extends Table
             ->integer('id')
             ->allowEmptyString('id', null, 'create');
 
-        $validator
-            ->integer('target')
-            ->requirePresence('target', 'create')
-            ->notEmptyString('target');
+        // $validator
+        //     ->integer('target')
+        //     ->requirePresence('target', 'create')
+        //     ->notEmptyString('target');
 
         $validator
             ->integer('rater')
@@ -71,7 +80,9 @@ class RatingsTable extends Table
         $validator
             ->integer('score')
             ->requirePresence('score', 'create')
-            ->notEmptyString('score');
+            ->notEmptyString('score')
+            ->greaterThan('score', 0)
+            ->lessThanOrEqual('score', 5);
 
         $validator
             ->scalar('comment')

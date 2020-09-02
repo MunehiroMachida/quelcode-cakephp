@@ -48,13 +48,11 @@
 					<?php elseif ($information === false && empty($is_received)) : ?>
 						<?= h('お届け先を入力してください') ?>
 					<?php else : ?>
-						<?= h('受け取り完了しました') ?>
+						<?= $this->Html->link(__('評価する'), ['action' => '../Ratings/add', 'biditem_id' => $buyer_status[$i]['id'], 'target' => $info->biditem['user_id'], 'rater' => $buyer_status[$i]['buyer_id']]) ?>
 					<?php endif; ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
-
-
 	</tbody>
 </table>
 

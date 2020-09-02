@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Controller\AppController;
@@ -56,7 +57,7 @@ class RatingsController extends AppController
             if ($this->Ratings->save($rating)) {
                 $this->Flash->success(__('The rating has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
+                return $this->redirect(['action' => '../auction']);
             }
             $this->Flash->error(__('The rating could not be saved. Please, try again.'));
         }
