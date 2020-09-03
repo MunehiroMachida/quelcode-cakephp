@@ -244,26 +244,44 @@ class AuctionController extends AuctionBaseController
 	// 落札者情報
 	public function buyerinfo()
 	{
-		// >BuyerStatusインスタンスを用意
-		$buyerstatus = $this->BuyerStatus->newEntity();
-		// POST送信時の処理
-		if ($this->request->is('post')) {
-			// $buyerstatusにフォームの送信内容を反映
-			$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
-			// $buyerstatusを保存する
-			if ($this->BuyerStatus->save($buyerstatus)) {
-				// 成功時のメッセージ
-				$this->Flash->success(__('保存しました。'));
-				// トップページ（index）に移動
-				return $this->redirect(['action' => 'home']);
-			}
-			// 失敗時のメッセージ
-			$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
-		}
-		// 値を保管
-		$this->set(compact('buyerstatus'));
-	}
+		// 落札者とログインユーザーが一緒か、商品idが落札の商品idと一緒か==================================
+		// 自分が落札したBidinfoをページネーションで取得
+		$bidinfos = $this->paginate('Bidinfo', [
+			'conditions' => ['Bidinfo.user_id' => $this->Auth->user('id')],
+			'contain' => ['Users', 'Biditems']
+		])->toArray();
 
+		$judgment = false;
+		foreach ($bidinfos as $bidinfo) {
+			if ($bidinfo->biditem_id === intval($_GET["biditem_id"]) && $bidinfo->user_id === $this->Auth->user('id')) {
+				$judgment = true;
+				break;
+			}
+		}
+		// ========================================================================================
+		if ($judgment === false) {
+			return $this->redirect(['action' => 'index']);
+		} else {
+			// >BuyerStatusインスタンスを用意
+			$buyerstatus = $this->BuyerStatus->newEntity();
+			// POST送信時の処理
+			if ($this->request->is('post')) {
+				// $buyerstatusにフォームの送信内容を反映
+				$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
+				// $buyerstatusを保存する
+				if ($this->BuyerStatus->save($buyerstatus)) {
+					// 成功時のメッセージ
+					$this->Flash->success(__('保存しました。'));
+					// トップページ（index）に移動
+					return $this->redirect(['action' => 'home']);
+				}
+				// 失敗時のメッセージ
+				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
+			}
+			// 値を保管
+			$this->set(compact('buyerstatus'));
+		}
+	}
 
 	public function rating()
 	{
