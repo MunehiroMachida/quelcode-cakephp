@@ -39,12 +39,11 @@
 							$information = false;
 						}
 					}
+					$is_ratings = false;
 					for ($j = 0; $j <= count($ratings); $j++) {
 						if (($ratings[$j]['biditem_id'] === $buyer_status_biditem_id) && ($ratings[$j]['rater'] === $biditem['user_id'])) {
 							$is_ratings = true;
 							break;
-						} else {
-							$is_ratings = false;
 						}
 					}
 					?>
