@@ -8,7 +8,9 @@
 			<th scope="col"><?= $this->Paginator->sort('created') ?></th>
 			<th scope="col" class="actions"><?= __('Actions') ?></th>
 			<th scope="col" class="sent"><?= __('Sent') ?></th>
-			<th scope="col" class="address"><?= __('address') ?></th>
+			<th scope="col" class="address"><?= __('PhoneNumber') ?></th>
+			<th scope="col" class="address"><?= __('PlaceName') ?></th>
+			<th scope="col" class="address"><?= __('Address') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -69,9 +71,23 @@
 				</td>
 				<td class="address">
 					<?php if ($buyer_status[$i]['biditem_id'] === $biditem['id']) : ?>
+						<?= h($buyer_status[$i]['name']) ?>
+					<?php else : ?>
+						<?= h('') ?>
+					<?php endif; ?>
+				</td>
+				<td class="address">
+					<?php if ($buyer_status[$i]['biditem_id'] === $biditem['id']) : ?>
+						<?= h($buyer_status[$i]['phone_number']) ?>
+					<?php else : ?>
+						<?= h('') ?>
+					<?php endif; ?>
+				</td>
+				<td class="address">
+					<?php if ($buyer_status[$i]['biditem_id'] === $biditem['id']) : ?>
 						<?= h($buyer_status[$i]['address']) ?>
 					<?php else : ?>
-						<?= h('落札者の住所が未登録です') ?>
+						<?= h('') ?>
 					<?php endif; ?>
 				</td>
 
