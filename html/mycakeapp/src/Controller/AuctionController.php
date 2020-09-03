@@ -222,7 +222,7 @@ class AuctionController extends AuctionBaseController
 			$this->Biditems->save($entity);
 			if ($this->Biditems->save($entity)) {
 				$bidinfo_array = $this->Bidinfo->find('all')->toArray();
-				$count = count($this->Bidinfo->find('all')->toArray());
+				$count = count($bidinfo_array);
 				for ($i = 0; $i <= $count; $i++) {
 					if ($bidinfo_array[$i]['biditem_id'] === $entity["id"]) {
 						$bidinfo_id = $bidinfo_array[$i]['id']; //bidinfoのid
