@@ -8,6 +8,7 @@
 			<th scope="col"><?= $this->Paginator->sort('created') ?></th>
 			<th scope="col" class="actions"><?= __('Actions') ?></th>
 			<th scope="col" class="sent"><?= __('Sent') ?></th>
+			<th scope="col" class="address"><?= __('address') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -66,6 +67,14 @@
 						<?= h('') ?>
 					<?php endif; ?>
 				</td>
+				<td class="address">
+					<?php if ($buyer_status[$i]['biditem_id'] === $biditem['id']) : ?>
+						<?= h($buyer_status[$i]['address']) ?>
+					<?php else : ?>
+						<?= h('落札者の住所が未登録です') ?>
+					<?php endif; ?>
+				</td>
+
 			</tr>
 		<?php endforeach; ?>
 	</tbody>
