@@ -42,11 +42,7 @@
 					}
 					$is_sent = $info->biditem->is_sent;
 					?>
-					<?php if ($information === true) : ?>
-						<?= $this->Html->link(__('メッセージ'), ['action' => 'msg', $info->id]) ?>
-					<?php else : ?>
-						<?= $this->Html->link(__('お届け先'), ['action' => 'buyerinfo', 'biditem_id' => $info->biditem->id]) ?>
-					<?php endif; ?>
+					<?= $this->Html->link(__('メッセージ'), ['action' => 'msg', $info->id]) ?>
 				</td>
 				<td class="received">
 					<?php if ($information === true && $is_received === false && $is_sent === true) : ?>
@@ -59,7 +55,7 @@
 					<?php elseif ($information === true && $is_received === false && $is_sent === false) : ?>
 						<?= h('商品が発送されるまでお待ちください') ?>
 					<?php elseif ($buyer_status_biditem_id !== $info->biditem->id) : ?>
-						<?= h('お届け先を入力してください') ?>
+						<?= $this->Html->link(__('お届け先を入力してください'), ['action' => 'buyerinfo', 'biditem_id' => $info->biditem->id]) ?>
 					<?php elseif ($is_ratings === true) : ?>
 						<?= h('評価しました') ?>
 					<?php elseif ($is_ratings === false) : ?>
