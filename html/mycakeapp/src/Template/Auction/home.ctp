@@ -33,12 +33,11 @@
 							$information = false;
 						}
 					}
+					$is_ratings = false;
 					for ($j = 0; $j <= count($ratings); $j++) {
 						if (($ratings[$j]['biditem_id'] === $buyer_status_biditem_id) && ($ratings[$j]['rater'] === $buyer_id)) {
 							$is_ratings = true;
 							break;
-						} else {
-							$is_ratings = false;
 						}
 					}
 					$is_sent = $info->biditem->is_sent;
