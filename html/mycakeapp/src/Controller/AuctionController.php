@@ -186,13 +186,13 @@ class AuctionController extends AuctionBaseController
 				$count = count($this->Bidinfo->find('all')->toArray());
 				for ($i = 0; $i <= $count; $i++) {
 					if ($bidinfo_array[$i]['biditem_id'] === $entity["biditem_id"]) {
-						$hoge = $bidinfo_array[$i]['id']; //bidinfoのid
+						$bidinfo_id = $bidinfo_array[$i]['id']; //bidinfoのid
 						break;
 					}
 				}
 				$bidmsg = $this->Bidmessages->newEntity();
-				$hoge = ['bidinfo_id' => $hoge, 'user_id' => $entity["buyer_id"], 'message' => '落札者が商品を受け取りました'];
-				$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $hoge);
+				$bidmsgs = ['bidinfo_id' => $bidinfo_id, 'user_id' => $entity["buyer_id"], 'message' => '落札者が商品を受け取りました'];
+				$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $bidmsgs);
 				// Bidmessageに発送完了を保存
 				$this->Bidmessages->save($bidmsg);
 				return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
@@ -225,13 +225,13 @@ class AuctionController extends AuctionBaseController
 				$count = count($this->Bidinfo->find('all')->toArray());
 				for ($i = 0; $i <= $count; $i++) {
 					if ($bidinfo_array[$i]['biditem_id'] === $entity["id"]) {
-						$hoge = $bidinfo_array[$i]['id']; //bidinfoのid
+						$bidinfo_id = $bidinfo_array[$i]['id']; //bidinfoのid
 						break;
 					}
 				}
 				$bidmsg = $this->Bidmessages->newEntity();
-				$hoge = ['bidinfo_id' => $hoge, 'user_id' => $entity["user_id"], 'message' => '出品者から商品が発送されました。'];
-				$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $hoge);
+				$bidmsgs = ['bidinfo_id' => $bidinfo_id, 'user_id' => $entity["user_id"], 'message' => '出品者から商品が発送されました。'];
+				$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $bidmsgs);
 				// Bidmessageに発送完了を保存
 				$this->Bidmessages->save($bidmsg);
 				return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
@@ -276,13 +276,18 @@ class AuctionController extends AuctionBaseController
 		])->toArray();
 
 		$sum = 0;
-		for ($i = 0; $i < count($ratings); $i++) {
-			if (is_int($ratings[$i]['score'])) {
-				$sum += $ratings[$i]['score'];
+		if (!empty($ratings)) {
+			for ($i = 0; $i < count($ratings); $i++) {
+				if (is_int($ratings[$i]['score'])) {
+					$sum += $ratings[$i]['score'];
+				}
 			}
+			$avg = $sum / count($ratings);
+			$avg = round($avg, 1);
+		} else {
+			$avg = 0;
 		}
-		$avg = $sum / count($ratings);
-		$avg = round($avg, 1);
+
 		$this->set(compact('ratings', 'avg'));
 	}
 }

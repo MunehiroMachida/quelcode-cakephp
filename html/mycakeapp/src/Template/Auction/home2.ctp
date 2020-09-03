@@ -57,7 +57,7 @@
 						?>
 					<?php elseif ($biditem['is_sent'] === true && $is_received === false && $information === true) : ?>
 						<?= h('発送完了しました') ?>
-					<?php elseif (($biditem['is_sent'] === false && $is_received === false && $information === false) || empty($buyer_status)) : ?>
+					<?php elseif (($biditem['is_sent'] === false && $is_received === false && $information === false) || is_null($buyer_status[$i])) : ?>
 						<?= h('落札者が情報を入力するまでお待ちください') ?>
 					<?php elseif ($is_ratings === true) : ?>
 						<?= h('評価しました') ?>
@@ -69,7 +69,6 @@
 				</td>
 			</tr>
 		<?php endforeach; ?>
-
 	</tbody>
 </table>
 <div class="paginator">
