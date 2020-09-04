@@ -8,6 +8,7 @@
 			<th scope="col"><?= $this->Paginator->sort('created') ?></th>
 			<th scope="col" class="actions"><?= __('Actions') ?></th>
 			<th scope="col" class="received"><?= __('Received') ?></th>
+			<th scope="col" class="received"><?= __('Address') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -20,17 +21,17 @@
 					<?php
 					error_reporting(0);
 					$count = count($buyer_status);
+					$information = false;
 					for ($i = 0; $i <= $count; $i++) {
-						if ($buyer_status[$i]['biditem_id'] === $info->biditem->id) {
+						if ($buyer_status[$i]['biditem_id'] === $info->biditem->id && $authuser['id'] === $info->user_id) {
 							// informationは落札情報が入力されているか。
 							$information = true;
 							$is_received = $buyer_status[$i]['is_received'];
 							$buyer_status_id = $buyer_status[$i]['id'];
 							$buyer_status_biditem_id = $buyer_status[$i]['biditem_id'];
 							$buyer_id = $buyer_status[$i]['buyer_id'];
+							$address = $buyer_status[$i]['address'];
 							break;
-						} else {
-							$information = false;
 						}
 					}
 					$is_ratings = false;
@@ -62,6 +63,15 @@
 						<?= $this->Html->link(__('評価する'), ['action' => '../Ratings/add', 'biditem_id' => $buyer_status_biditem_id, 'target' => $info->biditem['user_id'], 'rater' => $buyer_id]) ?>
 					<?php else : ?>
 						<?= h('') ?>
+					<?php endif; ?>
+				</td>
+				<td>
+					<?php if ($information === true) : ?>
+						<?= h('住所を送信済みです。' . $address) ?>
+					<?php else : ?>
+						<span class="red">
+							<?= h('住所が送信されていません') ?>
+						</span>
 					<?php endif; ?>
 				</td>
 			</tr>
