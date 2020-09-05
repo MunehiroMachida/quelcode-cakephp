@@ -51,18 +51,30 @@ class RatingsController extends AppController
      */
     public function add()
     {
-        $rating = $this->Ratings->newEntity();
-        if ($this->request->is('post')) {
-            $rating = $this->Ratings->patchEntity($rating, $this->request->getData());
-            if ($this->Ratings->save($rating)) {
-                $this->Flash->success(__('The rating has been saved.'));
-
-                return $this->redirect(['action' => '../auction']);
+        $ratings = $this->Ratings->find('all')->toArray();
+        $judgment = false;
+        for ($i = 0; $i < count($ratings); $i++) {
+            if ($ratings[$i]["biditem_id"] === intval($_GET["biditem_id"]) && $ratings[$i]["target"] === intval($_GET["target"]) && $ratings[$i]["rater"] === intval($_GET["rater"])) {
+                $judgment = true;
+                break;
             }
-            $this->Flash->error(__('The rating could not be saved. Please, try again.'));
         }
-        $biditems = $this->Ratings->Biditems->find('list', ['limit' => 200]);
-        $this->set(compact('rating', 'biditems'));
+        // var_dump($judgment);
+        if ($judgment === true) {
+            return $this->redirect(['action' => '../auction']);
+        } else {
+            $rating = $this->Ratings->newEntity();
+            if ($this->request->is('post')) {
+                $rating = $this->Ratings->patchEntity($rating, $this->request->getData());
+                if ($this->Ratings->save($rating)) {
+                    $this->Flash->success(__('The rating has been saved.'));
+                    return $this->redirect(['action' => '../auction']);
+                }
+                $this->Flash->error(__('The rating could not be saved. Please, try again.'));
+            }
+            $biditems = $this->Ratings->Biditems->find('list', ['limit' => 200]);
+            $this->set(compact('rating', 'biditems'));
+        }
     }
 
     /**
