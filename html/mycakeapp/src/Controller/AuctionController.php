@@ -258,8 +258,16 @@ class AuctionController extends AuctionBaseController
 				break;
 			}
 		}
+		$buyer_status = $this->BuyerStatus->find('all')->toArray();
+		$buyer_status_judgment = false;
+		for ($i = 0; $i < count($buyer_status); $i++) {
+			if ($buyer_status[$i]['biditem_id'] === $bidinfo->biditem_id) {
+				$buyer_status_judgment = true;
+				break;
+			}
+		}
 		// ========================================================================================
-		if ($judgment === false) {
+		if ($judgment === false || $buyer_status_judgment === true) {
 			return $this->redirect(['action' => 'index']);
 		} else {
 			// >BuyerStatusインスタンスを用意
