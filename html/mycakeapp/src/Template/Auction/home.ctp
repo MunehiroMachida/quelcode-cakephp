@@ -8,7 +8,7 @@
 			<th scope="col"><?= $this->Paginator->sort('created') ?></th>
 			<th scope="col" class="actions"><?= __('Actions') ?></th>
 			<th scope="col" class="received"><?= __('Received') ?></th>
-			<th scope="col" class="received"><?= __('Address') ?></th>
+			<th scope="col" class="received"><?= __('Personal_Information') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -31,6 +31,8 @@
 							$buyer_status_biditem_id = $buyer_status[$i]['biditem_id'];
 							$buyer_id = $buyer_status[$i]['buyer_id'];
 							$address = $buyer_status[$i]['address'];
+							$building_name = $buyer_status[$i]['name'];
+							$phone_number = $buyer_status[$i]['phone_number'];
 							break;
 						}
 					}
@@ -67,7 +69,10 @@
 				</td>
 				<td>
 					<?php if ($information === true) : ?>
-						<?= h('住所を送信済みです。' . $address) ?>
+						<p><?= h('送信済みです。') ?></p>
+						<p><?= h('建物名：' . $building_name) ?></p>
+						<p><?= h('住所：' . $address) ?></p>
+						<p><?= h('電話番号：' . $phone_number) ?></p>
 					<?php else : ?>
 						<span class="red">
 							<?= h('住所が送信されていません') ?>

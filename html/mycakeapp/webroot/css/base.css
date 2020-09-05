@@ -474,4 +474,5 @@ meta.foundation-version{font-family:"{{ VERSION }}"}meta.foundation-mq-small{fon
 }
 .red{
     color: rgb(255, 24, 24);
+    font-weight: bold;
 }
