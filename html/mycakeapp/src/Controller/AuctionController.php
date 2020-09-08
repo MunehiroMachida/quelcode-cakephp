@@ -251,23 +251,23 @@ class AuctionController extends AuctionBaseController
 			'contain' => ['Users', 'Biditems']
 		])->toArray();
 
-		$judgment = false;
+		$query_parameter_isError = false;
 		foreach ($bidinfos as $bidinfo) {
 			if ($bidinfo->biditem_id === intval($_GET["biditem_id"]) && $bidinfo->user_id === $this->Auth->user('id')) {
-				$judgment = true;
+				$query_parameter_isError = true;
 				break;
 			}
 		}
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
-		$buyer_status_judgment = false;
+		$is_buyer_status_id = false;
 		for ($i = 0; $i < count($buyer_status); $i++) {
 			if ($buyer_status[$i]['biditem_id'] === $bidinfo->biditem_id) {
-				$buyer_status_judgment = true;
+				$is_buyer_status_id = true;
 				break;
 			}
 		}
 		// ========================================================================================
-		if ($judgment === false || $buyer_status_judgment === true) {
+		if ($query_parameter_isError === false || $is_buyer_status_id === true) {
 			return $this->redirect(['action' => 'index']);
 		} else {
 			// >BuyerStatusインスタンスを用意
