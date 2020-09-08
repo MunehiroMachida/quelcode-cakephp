@@ -51,6 +51,7 @@ class RatingsController extends AppController
      */
     public function add()
     {
+        // すでに同じ、出品者、落札者が入っていないか調査
         $ratings = $this->Ratings->find('all')->toArray();
         $is_rating = false;
         for ($i = 0; $i < count($ratings); $i++) {
@@ -59,11 +60,11 @@ class RatingsController extends AppController
                 break;
             }
         }
-        // こっから、いつの商品に対して一回判定する まず商品のid、出品者、落札者をだそう
         $this->loadModel('BuyerStatus');
         $this->loadModel('Biditems');
         // 出品者を取得
         $biditems = $this->Biditems->find('all')->toArray();
+        $user_id = '';
         for ($j = 0; $j < count($biditems); $j++) {
             if ($biditems[$j]["id"] === intval($_GET["biditem_id"])) {
                 $biditems_id = $biditems[$j]["id"];
@@ -73,6 +74,7 @@ class RatingsController extends AppController
         }
         // 落札者を取得
         $buyerstatus = $this->BuyerStatus->find('all')->toArray();
+        $buyer_id = '';
         for ($x = 0; $x < count($buyerstatus); $x++) {
             if ($buyerstatus[$x]["biditem_id"] === intval($_GET["biditem_id"])) {
                 $buyerstatus_biditem_id = $buyerstatus[$x]["biditem_id"];
@@ -80,19 +82,11 @@ class RatingsController extends AppController
                 break;
             }
         }
+        // $_GET["target"]と$_GET["rater"]の値が出品者、落札者合っているか調査
         $query_parameter_isError = true;
         if ((intval($_GET["target"]) === $user_id && intval($_GET["rater"]) === $buyer_id) || (intval($_GET["target"]) === $buyer_id && intval($_GET["rater"]) === $user_id)) {
             $query_parameter_isError = false;
         }
-        // var_dump($query_parameter_isError);
-        // var_dump($_GET);
-        // var_dump($user_id);
-        // var_dump($buyer_id);
-        // // if (($user_id !== intval($_GET["target"]) && $buyer_id === intval($_GET["rater"])) || $user_id === intval($_GET["target"]) && $buyer_id !== intval($_GET["rater"]) || ($user_id !== intval($_GET["target"]) && $buyer_id !== intval($_GET["rater"]))) {
-        // //     $query_parameter_isError = true;
-        // // }
-        // ちょっと違うかも。同じ商品に落札者と出品者が１回ずつやらんと
-        // var_dump($buyer_id);
         if ($is_rating === true || $query_parameter_isError === true) {
             return $this->redirect(['action' => '../auction']);
         } else {
