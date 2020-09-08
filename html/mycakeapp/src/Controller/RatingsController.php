@@ -62,22 +62,28 @@ class RatingsController extends AppController
         }
         $this->loadModel('BuyerStatus');
         $this->loadModel('Biditems');
-        // 出品者を取得
+        // 商品idを調査
+        $biditems_id = NULL;
         $biditems = $this->Biditems->find('all')->toArray();
-        $user_id = '';
+        for ($y = 0; $y < count($biditems); $y++) {
+            if ($biditems[$y]["id"] === intval($_GET["biditem_id"])) {
+                $biditems_id = $biditems[$y]["id"];
+                break;
+            }
+        }
+        // 出品者を取得
+        $user_id = NULL;
         for ($j = 0; $j < count($biditems); $j++) {
-            if ($biditems[$j]["id"] === intval($_GET["biditem_id"])) {
-                $biditems_id = $biditems[$j]["id"];
+            if ($biditems_id === intval($_GET["biditem_id"])) {
                 $user_id = $biditems[$j]["user_id"];
                 break;
             }
         }
         // 落札者を取得
         $buyerstatus = $this->BuyerStatus->find('all')->toArray();
-        $buyer_id = '';
+        $buyer_id = NULL;
         for ($x = 0; $x < count($buyerstatus); $x++) {
-            if ($buyerstatus[$x]["biditem_id"] === intval($_GET["biditem_id"])) {
-                $buyerstatus_biditem_id = $buyerstatus[$x]["biditem_id"];
+            if ($biditems_id === intval($_GET["biditem_id"])) {
                 $buyer_id = $buyerstatus[$x]["buyer_id"];
                 break;
             }
