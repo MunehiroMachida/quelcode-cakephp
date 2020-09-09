@@ -316,4 +316,8 @@ class AuctionController extends AuctionBaseController
 
 		$this->set(compact('ratings', 'avg'));
 	}
+	public function ratingform()
+	{
+		var_dump($this->Auth->user());
+	}
 }
