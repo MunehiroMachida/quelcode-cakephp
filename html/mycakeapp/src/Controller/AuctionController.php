@@ -318,6 +318,8 @@ class AuctionController extends AuctionBaseController
 	}
 	public function ratingform()
 	{
-		var_dump($this->Auth->user());
+		$ratings = $this->Ratings->find('all')->toArray();
+		$this->set(compact('rating'));
+		var_dump($_REQUEST);
 	}
 }
