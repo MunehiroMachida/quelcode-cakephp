@@ -316,10 +316,4 @@ class AuctionController extends AuctionBaseController
 
 		$this->set(compact('ratings', 'avg'));
 	}
-	public function ratingform()
-	{
-		$ratings = $this->Ratings->find('all')->toArray();
-		$this->set(compact('rating'));
-		var_dump($_REQUEST);
-	}
 }

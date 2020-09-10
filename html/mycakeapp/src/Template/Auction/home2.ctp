@@ -64,7 +64,7 @@
 					<?php elseif ($is_ratings === true) : ?>
 						<?= h('評価しました') ?>
 					<?php elseif ($is_ratings === false) : ?>
-						<?= $this->Html->link(__('評価する'), ['action' => 'ratingform']) ?>
+						<?= $this->Html->link(__('評価する'), ['action' => '../Ratings/add', 'biditem_id' => $biditem['id'], 'target' => $buyer_id, 'rater' => $biditem['user_id']]) ?>
 					<?php else : ?>
 						<?= h('') ?>
 					<?php endif; ?>
