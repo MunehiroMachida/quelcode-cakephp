@@ -155,4 +155,5 @@ class RatingsController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+    test
 }
