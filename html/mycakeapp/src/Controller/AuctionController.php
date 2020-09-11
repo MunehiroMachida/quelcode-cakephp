@@ -253,7 +253,7 @@ class AuctionController extends AuctionBaseController
 
 		$query_parameter_isError = true;
 		foreach ($bidinfos as $bidinfo) {
-			if ($bidinfo->biditem_id === intval($_GET["biditem_id"]) && $bidinfo->user_id === $this->Auth->user('id')) {
+			if ($bidinfo->biditem_id === intval($_GET["biditem_id"])) {
 				$query_parameter_isError = false;
 				break;
 			}
