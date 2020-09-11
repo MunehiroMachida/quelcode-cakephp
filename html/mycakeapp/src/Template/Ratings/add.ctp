@@ -19,8 +19,8 @@
         <legend><?= __('評価してください') ?></legend>
         <?php
         echo $this->Form->hidden('biditem_id', ['value' => $_GET['biditem_id']]);
-        echo $this->Form->hidden('target', ['value' => $_GET['target']]);
-        echo $this->Form->hidden('rater', ['value' => $_GET['rater']]);
+        // echo $this->Form->hidden('target', ['value' => $_GET['target']]);
+        // echo $this->Form->hidden('rater', ['value' => $_GET['rater']]);
         echo $this->Form->control('score', ['label' => '評価数(1~5の数字を入力下さい)']);
         echo $this->Form->control('comment', ['label' => 'コメント']);
         ?>

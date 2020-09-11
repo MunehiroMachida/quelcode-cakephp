@@ -11,8 +11,23 @@ use App\Controller\AppController;
  *
  * @method \App\Model\Entity\Rating[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
-class RatingsController extends AuctionController
+class RatingsController extends AuctionBaseController
 {
+
+    // 初期化処理
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Paginator');
+        // 必要なモデルをすべてロード
+        $this->loadModel('Biditems');
+        $this->loadModel('BuyerStatus');
+        $this->loadModel('Ratings');
+        // ログインしているユーザー情報をauthuserに設定
+        $this->set('authuser', $this->Auth->user());
+        // レイアウトをauctionに変更
+        $this->viewBuilder()->setLayout('auction');
+    }
     /**
      * Index method
      *
@@ -51,64 +66,59 @@ class RatingsController extends AuctionController
      */
     public function add()
     {
-        var_dump($this->Auth);
-        // すでに同じ、出品者、落札者が入っていないか調査
-        $ratings = $this->Ratings->find('all')->toArray();
-        $is_rating = false;
-        for ($i = 0; $i < count($ratings); $i++) {
-            if ($ratings[$i]["biditem_id"] === intval($_GET["biditem_id"]) && $ratings[$i]["target"] === intval($_GET["target"]) && $ratings[$i]["rater"] === intval($_GET["rater"])) {
-                $is_rating = true;
-                break;
-            }
-        }
-        $this->loadModel('BuyerStatus');
-        $this->loadModel('Biditems');
-        // 商品idを調査
-        $biditems_id = NULL;
-        $biditems = $this->Biditems->find('all')->toArray();
-        for ($y = 0; $y < count($biditems); $y++) {
-            if ($biditems[$y]["id"] === intval($_GET["biditem_id"])) {
-                $biditems_id = $biditems[$y]["id"];
-                break;
-            }
-        }
+        $biditems = $this->Biditems->find('all')->toArray(); //出品者
         // 出品者を取得
-        $user_id = NULL;
         for ($j = 0; $j < count($biditems); $j++) {
-            if ($biditems_id === intval($_GET["biditem_id"])) {
-                $user_id = $biditems[$j]["user_id"];
+            if ($biditems[$j]["id"] === intval($_GET["biditem_id"])) {
+                $seller = $biditems[$j]["user_id"];
                 break;
             }
         }
+
+        $buyerstatus = $this->BuyerStatus->find('all')->toArray(); //落札者
         // 落札者を取得
-        $buyerstatus = $this->BuyerStatus->find('all')->toArray();
-        $buyer_id = NULL;
         for ($x = 0; $x < count($buyerstatus); $x++) {
-            if ($biditems_id === intval($_GET["biditem_id"])) {
+            if ($buyerstatus[$x]["biditem_id"] === intval($_GET["biditem_id"])) {
                 $buyer_id = $buyerstatus[$x]["buyer_id"];
                 break;
             }
         }
-        // $_GET["target"]と$_GET["rater"]の値が出品者、落札者合っているか調査
-        // $query_parameter_isError = true;
-        // if ((intval($_GET["target"]) === $user_id && intval($_GET["rater"]) === $buyer_id) || (intval($_GET["target"]) === $buyer_id && intval($_GET["rater"]) === $user_id)) {
-        //     $query_parameter_isError = false;
-        // }
-        // if ($is_rating === true || $query_parameter_isError === true) {
-        //     return $this->redirect(['action' => '../auction']);
-        // } else {
-        //     $rating = $this->Ratings->newEntity();
-        //     if ($this->request->is('post')) {
-        //         $rating = $this->Ratings->patchEntity($rating, $this->request->getData());
-        //         if ($this->Ratings->save($rating)) {
-        //             $this->Flash->success(__('The rating has been saved.'));
-        //             return $this->redirect(['action' => '../auction']);
-        //         }
-        //         $this->Flash->error(__('The rating could not be saved. Please, try again.'));
-        //     }
-        //     $biditems = $this->Ratings->Biditems->find('list', ['limit' => 200]);
-        //     $this->set(compact('rating', 'biditems'));
-        // }
+        $ratings = $this->Ratings->find('all')->toArray();
+        for ($i = 0; $i < count($ratings); $i++) {
+            // 商品が一致し、ログインユーザーの情報がすでにあったリダイレクト
+            if (($ratings[$i]["biditem_id"] === intval($_GET["biditem_id"]) && ($seller === $ratings[$i]["target"] || $buyer_id === $ratings[$i]["target"]) && $this->Auth->user('id') === $ratings[$i]["rater"])) {
+                return $this->redirect(['action' => '../auction']);
+            }
+        }
+        $rating = $this->Ratings->newEntity();
+        if ($this->Auth->user('id') === $seller) {
+            // 評価しようとしてるユーザーが出品者だった場合
+            if ($this->request->is('post')) {
+                $entity = $this->request->getData();
+                $entity['target'] = $buyer_id;
+                $entity['rater'] = $this->Auth->user('id');
+                $entity = $this->Ratings->patchEntity($rating, $entity);
+                if ($this->Ratings->save($entity)) {
+                    $this->Flash->success(__('評価の保存が成功しました'));
+                    return $this->redirect(['action' => '../auction']);
+                }
+                $this->Flash->error(__('評価の保存に失敗しました。'));
+            }
+        } elseif ($this->Auth->user('id') === $buyer_id) {
+            // 評価しようとしてるユーザーが落札者だった場合
+            if ($this->request->is('post')) {
+                $entity = $this->request->getData();
+                $entity['target'] = $seller;
+                $entity['rater'] = $this->Auth->user('id');
+                $entity = $this->Ratings->patchEntity($rating, $entity);
+                if ($this->Ratings->save($entity)) {
+                    $this->Flash->success(__('評価の保存が成功しました'));
+                    return $this->redirect(['action' => '../auction']);
+                }
+                $this->Flash->error(__('評価の保存に失敗しました。'));
+            }
+        }
+        $this->set(compact('rating'));
     }
 
     /**
