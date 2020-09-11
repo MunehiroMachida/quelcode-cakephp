@@ -251,10 +251,10 @@ class AuctionController extends AuctionBaseController
 			'contain' => ['Users', 'Biditems']
 		])->toArray();
 
-		$query_parameter_isError = false;
+		$query_parameter_isError = true;
 		foreach ($bidinfos as $bidinfo) {
 			if ($bidinfo->biditem_id === intval($_GET["biditem_id"]) && $bidinfo->user_id === $this->Auth->user('id')) {
-				$query_parameter_isError = true;
+				$query_parameter_isError = false;
 				break;
 			}
 		}
@@ -267,7 +267,7 @@ class AuctionController extends AuctionBaseController
 			}
 		}
 		// ========================================================================================
-		if ($query_parameter_isError === false || $is_buyer_status_id === true) {
+		if ($query_parameter_isError === true || $is_buyer_status_id === true) {
 			return $this->redirect(['action' => 'index']);
 		} else {
 			// >BuyerStatusインスタンスを用意
