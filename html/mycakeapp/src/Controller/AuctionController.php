@@ -176,7 +176,13 @@ class AuctionController extends AuctionBaseController
 			'limit' => 10
 		])->toArray();
 		$this->set(compact('bidinfo'));
+		$buyer_status = $this->BuyerStatus->find('all')->toArray(); //出品者
 		if ($this->request->is('post')) {
+			for ($i = 0; $i < count($buyer_status); $i++) {
+				if ($buyer_status[$i]["id"] === intval($this->request->getData(['buyer'])) && $buyer_status[$i]["buyer_id"] === $this->Auth->user('id')) {
+					$buyer_status_id = $buyer_status[$i]["id"];
+				}
+			}
 			$buyer_status_id = (intval($this->request->getData(['buyer'])));
 			$entity = $this->BuyerStatus->get($buyer_status_id);
 			$this->BuyerStatus->patchEntity($entity, ['is_received' => true]);
