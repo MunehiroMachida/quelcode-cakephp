@@ -215,8 +215,14 @@ class AuctionController extends AuctionBaseController
 		])->toArray();
 		$this->set(compact('biditems'));
 
+		$biditems = $this->Biditems->find('all')->toArray(); //出品者
+		// 出品者を取得
 		if ($this->request->is('post')) {
-			$biditems_id = (intval($this->request->getData(['item'])));
+			for ($i = 0; $i < count($biditems); $i++) {
+				if ($biditems[$i]["id"] === intval($this->request->getData(['item'])) && $biditems[$i]["user_id"] === $this->Auth->user('id')) {
+					$biditems_id = $biditems[$i]["id"];
+				}
+			}
 			$entity = $this->Biditems->get($biditems_id);
 			$this->Biditems->patchEntity($entity, ['is_sent' => true]);
 			$this->Biditems->save($entity);
