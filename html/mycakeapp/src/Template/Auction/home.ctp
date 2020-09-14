@@ -50,7 +50,7 @@
 				<td class="received">
 					<?php if ($information === true && $is_received === false && $is_sent === true) : ?>
 						<?php
-						echo $this->Form->create(null, ['type' => 'post', 'url' => ['controller' => 'Auction', 'auction' => 'home']]);
+						echo $this->Form->create(null, ['type' => 'post', 'url' => ['controller' => 'Auction', 'action' => 'home']]);
 						echo $this->Form->hidden('buyer', ['value' => $buyer_status[$i]['id']]);
 						echo $this->Form->button('受け取り完了');
 						echo $this->Form->end();

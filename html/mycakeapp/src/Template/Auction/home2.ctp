@@ -52,7 +52,7 @@
 					?>
 					<?php if ($biditem['is_sent'] === false && $is_received === false && $information === true) : ?>
 						<?php
-						echo $this->Form->create(null, ['type' => 'post', 'url' => ['controller' => 'Auction', 'auction' => 'home2']]);
+						echo $this->Form->create(null, ['type' => 'post', 'url' => ['controller' => 'Auction', 'action' => 'home2']]);
 						echo $this->Form->hidden('item', ['value' => $biditem['id']]);
 						echo $this->Form->button('発送完了');
 						echo $this->Form->end();
