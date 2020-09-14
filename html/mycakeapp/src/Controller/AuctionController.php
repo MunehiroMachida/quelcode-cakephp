@@ -220,35 +220,47 @@ class AuctionController extends AuctionBaseController
 		$this->set(compact('biditems'));
 
 		$biditems = $this->Biditems->find('all')->toArray(); //出品者
+		$buyer_status = $this->BuyerStatus->find('all')->toArray(); //落札者の情報
 		// 出品者を取得
 		if ($this->request->is('post')) {
 			for ($i = 0; $i < count($biditems); $i++) {
 				if ($biditems[$i]["id"] === intval($this->request->getData(['item'])) && $biditems[$i]["user_id"] === $this->Auth->user('id')) {
-					$biditems_id = $biditems[$i]["id"];
+					$biditems_id = $biditems[$i]['id'];
+					$biditems_is_sent = $biditems[$i]['is_sent'];
 					break;
 				}
 			}
-			$entity = $this->Biditems->get($biditems_id);
-			$this->Biditems->patchEntity($entity, ['is_sent' => true]);
-			$this->Biditems->save($entity);
-			if ($this->Biditems->save($entity)) {
-				$bidinfo_array = $this->Bidinfo->find('all')->toArray();
-				for ($i = 0; $i <= count($bidinfo_array); $i++) {
-					if ($bidinfo_array[$i]['biditem_id'] === $entity["id"]) {
-						$bidinfo_id = $bidinfo_array[$i]['id']; //bidinfoのid
-						break;
-					}
+			// 落札者の情報が入力されているか確認
+			$information = false;
+			for ($j = 0; $j < count($buyer_status); $j++) {
+				if ($buyer_status[$j]['biditem_id'] === $biditems_id) {
+					$information = false;
+					break;
 				}
-				$bidmsg = $this->Bidmessages->newEntity();
-				$bidmsgs = ['bidinfo_id' => $bidinfo_id, 'user_id' => $entity["user_id"], 'message' => '出品者から商品が発送されました。'];
-				$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $bidmsgs);
-				// Bidmessageに発送完了を保存
-				$this->Bidmessages->save($bidmsg);
-				return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
+			}
+			if ($information === true && $biditems_is_sent === false) {
+				$entity = $this->Biditems->get($biditems_id);
+				$this->Biditems->patchEntity($entity, ['is_sent' => true]);
+				$this->Biditems->save($entity);
+				if ($this->Biditems->save($entity)) {
+					$bidinfo_array = $this->Bidinfo->find('all')->toArray();
+					for ($i = 0; $i <= count($bidinfo_array); $i++) {
+						if ($bidinfo_array[$i]['biditem_id'] === $entity["id"]) {
+							$bidinfo_id = $bidinfo_array[$i]['id']; //bidinfoのid
+							break;
+						}
+					}
+					$bidmsg = $this->Bidmessages->newEntity();
+					$bidmsgs = ['bidinfo_id' => $bidinfo_id, 'user_id' => $entity["user_id"], 'message' => '出品者から商品が発送されました。'];
+					$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $bidmsgs);
+					// Bidmessageに発送完了を保存
+					$this->Bidmessages->save($bidmsg);
+					return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
+				}
 			}
 		}
 		$ratings = $this->Ratings->find('all')->toArray();
-		$buyer_status = $this->BuyerStatus->find('all')->toArray();
+
 		$this->set(compact('ratings', 'buyer_status'));
 	}
 	// 落札者情報
