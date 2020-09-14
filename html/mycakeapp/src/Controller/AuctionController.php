@@ -234,7 +234,7 @@ class AuctionController extends AuctionBaseController
 			$information = false;
 			for ($j = 0; $j < count($buyer_status); $j++) {
 				if ($buyer_status[$j]['biditem_id'] === $biditems_id) {
-					$information = false;
+					$information = true;
 					break;
 				}
 			}
@@ -260,7 +260,6 @@ class AuctionController extends AuctionBaseController
 			}
 		}
 		$ratings = $this->Ratings->find('all')->toArray();
-
 		$this->set(compact('ratings', 'buyer_status'));
 	}
 	// 落札者情報
