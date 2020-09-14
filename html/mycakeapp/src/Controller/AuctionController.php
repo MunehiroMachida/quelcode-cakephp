@@ -181,16 +181,15 @@ class AuctionController extends AuctionBaseController
 			for ($i = 0; $i < count($buyer_status); $i++) {
 				if ($buyer_status[$i]["id"] === intval($this->request->getData(['buyer'])) && $buyer_status[$i]["buyer_id"] === $this->Auth->user('id')) {
 					$buyer_status_id = $buyer_status[$i]["id"];
+					break;
 				}
 			}
-			$buyer_status_id = (intval($this->request->getData(['buyer'])));
 			$entity = $this->BuyerStatus->get($buyer_status_id);
 			$this->BuyerStatus->patchEntity($entity, ['is_received' => true]);
 			$this->BuyerStatus->save($entity);
 			if ($this->BuyerStatus->save($entity)) {
 				$bidinfo_array = $this->Bidinfo->find('all')->toArray();
-				$count = count($this->Bidinfo->find('all')->toArray());
-				for ($i = 0; $i <= $count; $i++) {
+				for ($i = 0; $i <= count($bidinfo_array); $i++) {
 					if ($bidinfo_array[$i]['biditem_id'] === $entity["biditem_id"]) {
 						$bidinfo_id = $bidinfo_array[$i]['id']; //bidinfoのid
 						break;
@@ -204,7 +203,6 @@ class AuctionController extends AuctionBaseController
 				return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
 			}
 		}
-		$buyer_status = $this->BuyerStatus->find('all')->toArray();
 		$ratings = $this->Ratings->find('all')->toArray();
 		$this->set(compact('buyer_status', 'ratings'));
 	}
@@ -227,6 +225,7 @@ class AuctionController extends AuctionBaseController
 			for ($i = 0; $i < count($biditems); $i++) {
 				if ($biditems[$i]["id"] === intval($this->request->getData(['item'])) && $biditems[$i]["user_id"] === $this->Auth->user('id')) {
 					$biditems_id = $biditems[$i]["id"];
+					break;
 				}
 			}
 			$entity = $this->Biditems->get($biditems_id);
@@ -234,8 +233,7 @@ class AuctionController extends AuctionBaseController
 			$this->Biditems->save($entity);
 			if ($this->Biditems->save($entity)) {
 				$bidinfo_array = $this->Bidinfo->find('all')->toArray();
-				$count = count($bidinfo_array);
-				for ($i = 0; $i <= $count; $i++) {
+				for ($i = 0; $i <= count($bidinfo_array); $i++) {
 					if ($bidinfo_array[$i]['biditem_id'] === $entity["id"]) {
 						$bidinfo_id = $bidinfo_array[$i]['id']; //bidinfoのid
 						break;
