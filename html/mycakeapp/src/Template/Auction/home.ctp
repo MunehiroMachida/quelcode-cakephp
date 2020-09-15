@@ -36,10 +36,10 @@
 							break;
 						}
 					}
-					$is_ratings = false;
+					$is_finished_ratings = false;
 					for ($j = 0; $j <= count($ratings); $j++) {
 						if (($ratings[$j]['biditem_id'] === $buyer_status_biditem_id) && ($ratings[$j]['rater'] === $buyer_id)) {
-							$is_ratings = true;
+							$is_finished_ratings = true;
 							break;
 						}
 					}
@@ -59,9 +59,9 @@
 						<?= h('商品が発送されるまでお待ちください') ?>
 					<?php elseif ($buyer_status_biditem_id !== $info->biditem->id) : ?>
 						<?= $this->Html->link(__('お届け先を入力してください'), ['action' => 'buyerinfo', 'biditem_id' => $info->biditem->id]) ?>
-					<?php elseif ($is_ratings === true) : ?>
+					<?php elseif ($is_finished_ratings === true) : ?>
 						<?= h('評価しました') ?>
-					<?php elseif ($is_ratings === false) : ?>
+					<?php elseif ($is_finished_ratings === false) : ?>
 						<?= $this->Html->link(__('評価する'), ['action' => '../Ratings/add', 'biditem_id' => $buyer_status_biditem_id]) ?>
 					<?php else : ?>
 						<?= h('') ?>
