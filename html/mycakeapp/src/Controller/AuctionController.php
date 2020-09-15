@@ -277,6 +277,14 @@ class AuctionController extends AuctionBaseController
 			'contain' => ['Users', 'Biditems']
 		])->toArray();
 
+		$bidinfo = $this->Bidinfo->find('all')->toArray();
+		for ($j = 0; $j < count($bidinfo); $j++) {
+			if ($bidinfo[$j]['biditem_id'] === intval($_GET["biditem_id"])) {
+				$bidinfo_biditem_id = $bidinfo[$j]['biditem_id']; //商品idが落札されているかチェック
+				break;
+			}
+		}
+		// getの商品idが落札されていなかったらtrue
 		$query_parameter_isError = true;
 		foreach ($bidinfos as $bidinfo) {
 			if ($bidinfo->biditem_id === intval($_GET["biditem_id"])) {
@@ -284,6 +292,7 @@ class AuctionController extends AuctionBaseController
 				break;
 			}
 		}
+		// getの商品idで、すでに落札者情報が入力されていたら
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
 		$is_buyer_status_id = false;
 		for ($i = 0; $i < count($buyer_status); $i++) {
@@ -300,17 +309,21 @@ class AuctionController extends AuctionBaseController
 			$buyerstatus = $this->BuyerStatus->newEntity();
 			// POST送信時の処理
 			if ($this->request->is('post')) {
-				// $buyerstatusにフォームの送信内容を反映
-				$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
-				// $buyerstatusを保存する
-				if ($this->BuyerStatus->save($buyerstatus)) {
-					// 成功時のメッセージ
-					$this->Flash->success(__('保存しました。'));
-					// トップページ（index）に移動
-					return $this->redirect(['action' => 'home']);
+				if ($bidinfo_biditem_id === intval($_POST["biditem_id"])) { //ここでpostされた値が書き換えられていないかチェック
+					// $buyerstatusにフォームの送信内容を反映
+					$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
+					// $buyerstatusを保存する
+					if ($this->BuyerStatus->save($buyerstatus)) {
+						// 成功時のメッセージ
+						$this->Flash->success(__('保存しました。'));
+						// トップページ（index）に移動
+						return $this->redirect(['action' => 'home']);
+					}
+					// 失敗時のメッセージ
+					$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
+				} else {
+					$this->Flash->error(__('商品idが異なります。もう一度入力下さい。'));
 				}
-				// 失敗時のメッセージ
-				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 			}
 			// 値を保管
 			$this->set(compact('buyerstatus'));
