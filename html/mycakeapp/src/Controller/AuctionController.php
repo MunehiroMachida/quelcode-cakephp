@@ -276,33 +276,32 @@ class AuctionController extends AuctionBaseController
 			'conditions' => ['Bidinfo.user_id' => $this->Auth->user('id')],
 			'contain' => ['Users', 'Biditems']
 		])->toArray();
-
 		$bidinfo = $this->Bidinfo->find('all')->toArray();
 		for ($j = 0; $j < count($bidinfo); $j++) {
 			if ($bidinfo[$j]['biditem_id'] === intval($_GET["biditem_id"])) {
 				$bidinfo_biditem_id = $bidinfo[$j]['biditem_id']; //商品idが落札されているかチェック
-				break;
-			}
-		}
-		// getの商品idが落札されていなかったらtrue
-		$query_parameter_isError = true;
-		foreach ($bidinfos as $bidinfo) {
-			if ($bidinfo->biditem_id === intval($_GET["biditem_id"])) {
 				$query_parameter_isError = false;
 				break;
+			} else {
+				$bidinfo_biditem_id = NULL;
+				$query_parameter_isError = true;
 			}
 		}
 		// getの商品idで、すでに落札者情報が入力されていたら
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
 		$is_buyer_status_id = false;
+		$is_null = false;
 		for ($i = 0; $i < count($buyer_status); $i++) {
-			if ($buyer_status[$i]['biditem_id'] === $bidinfo->biditem_id) {
+			if ($bidinfo_biditem_id === NULL) {
+				$is_null = true;
+				break;
+			} elseif ($buyer_status[$i]['biditem_id'] === $bidinfo_biditem_id) {
 				$is_buyer_status_id = true;
 				break;
 			}
 		}
 		// ========================================================================================
-		if ($query_parameter_isError === true || $is_buyer_status_id === true) {
+		if ($query_parameter_isError === true || $is_buyer_status_id === true || $is_null === true) {
 			return $this->redirect(['action' => 'index']);
 		} else {
 			// >BuyerStatusインスタンスを用意
