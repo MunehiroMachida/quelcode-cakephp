@@ -207,6 +207,8 @@ class AuctionController extends AuctionBaseController
 					return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
 				}
 			}
+		} else {
+			$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 		}
 		$ratings = $this->Ratings->find('all')->toArray();
 		$this->set(compact('buyer_status', 'ratings'));
@@ -263,6 +265,8 @@ class AuctionController extends AuctionBaseController
 					return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
 				}
 			}
+		} else {
+			$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 		}
 		$ratings = $this->Ratings->find('all')->toArray();
 		$this->set(compact('ratings', 'buyer_status'));
@@ -276,57 +280,48 @@ class AuctionController extends AuctionBaseController
 			'conditions' => ['Bidinfo.user_id' => $this->Auth->user('id')],
 			'contain' => ['Users', 'Biditems']
 		])->toArray();
+
 		$bidinfo = $this->Bidinfo->find('all')->toArray();
 		for ($j = 0; $j < count($bidinfo); $j++) {
+			//商品idが落札されているかチェック
 			if ($bidinfo[$j]['biditem_id'] === intval($_GET["biditem_id"])) {
-				$bidinfo_biditem_id = $bidinfo[$j]['biditem_id']; //商品idが落札されているかチェック
-				$query_parameter_isError = false;
+				$bidinfo_biditem_id = $bidinfo[$j]['biditem_id'];
 				break;
 			} else {
-				$bidinfo_biditem_id = NULL;
-				$query_parameter_isError = true;
+				return $this->redirect(['action' => 'index']);
 			}
 		}
 		// getの商品idで、すでに落札者情報が入力されていたら
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
-		$is_buyer_status_id = false;
-		$is_null = false;
 		for ($i = 0; $i < count($buyer_status); $i++) {
-			if ($bidinfo_biditem_id === NULL) {
-				$is_null = true;
-				break;
-			} elseif ($buyer_status[$i]['biditem_id'] === $bidinfo_biditem_id) {
-				$is_buyer_status_id = true;
-				break;
+			if ($buyer_status[$i]['biditem_id'] === $bidinfo_biditem_id) {
+				return $this->redirect(['action' => 'index']);
 			}
 		}
 		// ========================================================================================
-		if ($query_parameter_isError === true || $is_buyer_status_id === true || $is_null === true) {
-			return $this->redirect(['action' => 'index']);
-		} else {
-			// >BuyerStatusインスタンスを用意
-			$buyerstatus = $this->BuyerStatus->newEntity();
-			// POST送信時の処理
-			if ($this->request->is('post')) {
-				if ($bidinfo_biditem_id === intval($_POST["biditem_id"])) { //ここでpostされた値が書き換えられていないかチェック
-					// $buyerstatusにフォームの送信内容を反映
-					$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
-					// $buyerstatusを保存する
-					if ($this->BuyerStatus->save($buyerstatus)) {
-						// 成功時のメッセージ
-						$this->Flash->success(__('保存しました。'));
-						// トップページ（index）に移動
-						return $this->redirect(['action' => 'home']);
-					}
-					// 失敗時のメッセージ
-					$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
-				} else {
-					$this->Flash->error(__('商品idが異なります。もう一度入力下さい。'));
+
+		// >BuyerStatusインスタンスを用意
+		$buyerstatus = $this->BuyerStatus->newEntity();
+		// POST送信時の処理
+		if ($this->request->is('post')) {
+			if ($bidinfo_biditem_id === intval($_POST["biditem_id"])) { //ここでpostされた値が書き換えられていないかチェック
+				// $buyerstatusにフォームの送信内容を反映
+				$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
+				// $buyerstatusを保存する
+				if ($this->BuyerStatus->save($buyerstatus)) {
+					// 成功時のメッセージ
+					$this->Flash->success(__('保存しました。'));
+					// トップページ（index）に移動
+					return $this->redirect(['action' => 'home']);
 				}
+				// 失敗時のメッセージ
+				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
+			} else {
+				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 			}
-			// 値を保管
-			$this->set(compact('buyerstatus'));
 		}
+		// 値を保管
+		$this->set(compact('buyerstatus'));
 	}
 
 	public function rating()
