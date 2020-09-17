@@ -73,9 +73,10 @@ class RatingsController extends AuctionBaseController
                 $seller = $biditems[$j]["user_id"];
                 break;
             } else {
-                return $this->redirect(['action' => '../auction']);
+                $seller = false;
             }
         }
+
 
         $buyerstatus = $this->BuyerStatus->find('all')->toArray(); //落札者
         // 落札者を取得
@@ -84,8 +85,11 @@ class RatingsController extends AuctionBaseController
                 $buyer_id = $buyerstatus[$x]["buyer_id"];
                 break;
             } else {
-                return $this->redirect(['action' => '../auction']);
+                $buyer_id = false;
             }
+        }
+        if ($seller === false || $buyer_id === false) {
+            return $this->redirect(['action' => '../auction']);
         }
         $ratings = $this->Ratings->find('all')->toArray();
         for ($i = 0; $i < count($ratings); $i++) {
