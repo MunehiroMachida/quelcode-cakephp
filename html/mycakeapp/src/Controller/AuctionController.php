@@ -280,10 +280,7 @@ class AuctionController extends AuctionBaseController
 			'conditions' => ['Bidinfo.user_id' => $this->Auth->user('id')],
 			'contain' => ['Users', 'Biditems']
 		])->toArray();
-
 		$bidinfo = $this->Bidinfo->find('all')->toArray();
-
-
 		for ($j = 0; $j < count($bidinfo); $j++) {
 			//商品idが落札されているかチェック
 			if ($bidinfo[$j]['biditem_id'] === intval($_GET["biditem_id"])) {
@@ -293,7 +290,6 @@ class AuctionController extends AuctionBaseController
 				$bidinfo_biditem_id = false;
 			}
 		}
-		//落札されいない商品idだった場合にはindexまで飛ばす
 		if ($bidinfo_biditem_id === false) {
 			return $this->redirect(['action' => 'index']);
 		}
@@ -321,6 +317,8 @@ class AuctionController extends AuctionBaseController
 					return $this->redirect(['action' => 'home']);
 				}
 				// 失敗時のメッセージ
+				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
+			} else {
 				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 			}
 		}
