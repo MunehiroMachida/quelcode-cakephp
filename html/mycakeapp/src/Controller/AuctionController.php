@@ -277,16 +277,15 @@ class AuctionController extends AuctionBaseController
 			'contain' => ['Users', 'Biditems']
 		])->toArray();
 		$bidinfo = $this->Bidinfo->find('all')->toArray();
-		for ($j = 0; $j < count($bidinfo); $j++) {
+		$countBidinfo = count($bidinfo);
+		for ($j = 0; $j < $countBidinfo; $j++) {
 			//商品idが落札されているかチェック
 			if ($bidinfo[$j]['biditem_id'] === intval($_GET["biditem_id"])) {
 				$bidinfo_biditem_id = $bidinfo[$j]['biditem_id'];
 				break;
-			} elseif ($bidinfo[$j]['biditem_id'] !== intval($_GET["biditem_id"])) {
-				$bidinfo_biditem_id = false;
 			}
 		}
-		if ($bidinfo_biditem_id === false) {
+		if (false === isset($bidinfo_biditem_id)) {
 			return $this->redirect(['action' => 'index']);
 		}
 		// 落札されていなかったら
