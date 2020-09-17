@@ -271,11 +271,6 @@ class AuctionController extends AuctionBaseController
 	public function buyerinfo()
 	{
 		// 落札者とログインユーザーが一緒か、商品idが落札の商品idと一緒か==================================
-		// 自分が落札したBidinfoをページネーションで取得
-		$bidinfos = $this->paginate('Bidinfo', [
-			'conditions' => ['Bidinfo.user_id' => $this->Auth->user('id')],
-			'contain' => ['Users', 'Biditems']
-		])->toArray();
 		$bidinfo = $this->Bidinfo->find('all')->toArray();
 		$countBidinfo = count($bidinfo);
 		for ($j = 0; $j < $countBidinfo; $j++) {
