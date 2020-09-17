@@ -282,15 +282,22 @@ class AuctionController extends AuctionBaseController
 		])->toArray();
 
 		$bidinfo = $this->Bidinfo->find('all')->toArray();
+
+
 		for ($j = 0; $j < count($bidinfo); $j++) {
 			//商品idが落札されているかチェック
 			if ($bidinfo[$j]['biditem_id'] === intval($_GET["biditem_id"])) {
 				$bidinfo_biditem_id = $bidinfo[$j]['biditem_id'];
 				break;
-			} else {
-				return $this->redirect(['action' => 'index']);
+			} elseif ($bidinfo[$j]['biditem_id'] !== intval($_GET["biditem_id"])) {
+				$bidinfo_biditem_id = false;
 			}
 		}
+		//落札されいない商品idだった場合にはindexまで飛ばす
+		if ($bidinfo_biditem_id === false) {
+			return $this->redirect(['action' => 'index']);
+		}
+		// 落札されていなかったら
 		// getの商品idで、すでに落札者情報が入力されていたら
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
 		for ($i = 0; $i < count($buyer_status); $i++) {
@@ -299,7 +306,6 @@ class AuctionController extends AuctionBaseController
 			}
 		}
 		// ========================================================================================
-
 		// >BuyerStatusインスタンスを用意
 		$buyerstatus = $this->BuyerStatus->newEntity();
 		// POST送信時の処理
@@ -315,8 +321,6 @@ class AuctionController extends AuctionBaseController
 					return $this->redirect(['action' => 'home']);
 				}
 				// 失敗時のメッセージ
-				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
-			} else {
 				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 			}
 		}
