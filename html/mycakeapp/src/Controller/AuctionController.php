@@ -207,8 +207,6 @@ class AuctionController extends AuctionBaseController
 					return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
 				}
 			}
-		} else {
-			$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 		}
 		$ratings = $this->Ratings->find('all')->toArray();
 		$this->set(compact('buyer_status', 'ratings'));
@@ -265,8 +263,6 @@ class AuctionController extends AuctionBaseController
 					return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
 				}
 			}
-		} else {
-			$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 		}
 		$ratings = $this->Ratings->find('all')->toArray();
 		$this->set(compact('ratings', 'buyer_status'));
