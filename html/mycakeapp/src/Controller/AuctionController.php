@@ -275,7 +275,8 @@ class AuctionController extends AuctionBaseController
 		$countBidinfo = count($bidinfo);
 		for ($j = 0; $j < $countBidinfo; $j++) {
 			//商品idが落札されているかチェック
-			if ($bidinfo[$j]['biditem_id'] === intval($_GET["biditem_id"])) {
+			if ($bidinfo[$j]['biditem_id'] === intval($_GET["biditem_id"]) && $bidinfo[$j]['user_id'] === $this->Auth->user('id')) {
+				//ここでログインユーザーが落札したかチェック
 				$bidinfo_biditem_id = $bidinfo[$j]['biditem_id'];
 				break;
 			}
@@ -283,7 +284,6 @@ class AuctionController extends AuctionBaseController
 		if (false === isset($bidinfo_biditem_id)) {
 			return $this->redirect(['action' => 'index']);
 		}
-
 		// 落札されていなかったら
 		// getの商品idで、すでに落札者情報が入力されていたら
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
@@ -297,12 +297,12 @@ class AuctionController extends AuctionBaseController
 		$buyerstatus = $this->BuyerStatus->newEntity();
 		// POST送信時の処理
 		if ($this->request->is('post')) {
-			if (intval($_POST["is_received"]) !== 0) { //ここで受け取り完了のチェック
-				return $this->redirect(['action' => 'index']);
-			}
-			if ($bidinfo_biditem_id === intval($_POST["biditem_id"])) { //ここでpostされた値が書き換えられていないかチェック
+			if ($bidinfo_biditem_id === intval($_GET["biditem_id"])) {
 				// $buyerstatusにフォームの送信内容を反映
 				$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
+				$buyerstatus['biditem_id'] = $bidinfo_biditem_id;
+				$buyerstatus['buyer_id'] = $this->Auth->user('id');
+				$buyerstatus['is_received'] = false;
 				// $buyerstatusを保存する
 				if ($this->BuyerStatus->save($buyerstatus)) {
 					// 成功時のメッセージ
