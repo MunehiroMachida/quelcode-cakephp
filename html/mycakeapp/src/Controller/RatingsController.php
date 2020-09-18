@@ -71,18 +71,18 @@ class RatingsController extends AuctionBaseController
         for ($j = 0; $j < count($biditems); $j++) {
             if ($biditems[$j]["id"] === intval($_GET["biditem_id"])) {
                 $seller = $biditems[$j]["user_id"];
+                $biditems_id = $biditems[$j]["id"];
                 break;
             } else {
                 $seller = false;
             }
         }
-
-
         $buyerstatus = $this->BuyerStatus->find('all')->toArray(); //落札者
         // 落札者を取得
         for ($x = 0; $x < count($buyerstatus); $x++) {
             if ($buyerstatus[$x]["biditem_id"] === intval($_GET["biditem_id"])) {
                 $buyer_id = $buyerstatus[$x]["buyer_id"];
+                $buyerstatus_biditem_id = $buyerstatus[$x]["biditem_id"];
                 break;
             } else {
                 $buyer_id = false;
@@ -102,28 +102,38 @@ class RatingsController extends AuctionBaseController
         if ($this->Auth->user('id') === $seller) {
             // 評価しようとしてるユーザーが出品者だった場合
             if ($this->request->is('post')) {
-                $entity = $this->request->getData();
-                $entity['target'] = $buyer_id;
-                $entity['rater'] = $this->Auth->user('id');
-                $entity = $this->Ratings->patchEntity($rating, $entity);
-                if ($this->Ratings->save($entity)) {
-                    $this->Flash->success(__('評価の保存が成功しました'));
+                if (intval($_GET['biditem_id']) === $biditems_id) {
+                    $entity = $this->request->getData();
+                    $entity['biditem_id'] = $biditems_id;
+                    $entity['target'] = $buyer_id;
+                    $entity['rater'] = $this->Auth->user('id');
+                    $entity = $this->Ratings->patchEntity($rating, $entity);
+                    if ($this->Ratings->save($entity)) {
+                        $this->Flash->success(__('評価の保存が成功しました'));
+                        return $this->redirect(['action' => '../auction']);
+                    }
+                    $this->Flash->error(__('評価の保存に失敗しました。'));
+                } else {
                     return $this->redirect(['action' => '../auction']);
                 }
-                $this->Flash->error(__('評価の保存に失敗しました。'));
             }
         } elseif ($this->Auth->user('id') === $buyer_id) {
             // 評価しようとしてるユーザーが落札者だった場合
             if ($this->request->is('post')) {
-                $entity = $this->request->getData();
-                $entity['target'] = $seller;
-                $entity['rater'] = $this->Auth->user('id');
-                $entity = $this->Ratings->patchEntity($rating, $entity);
-                if ($this->Ratings->save($entity)) {
-                    $this->Flash->success(__('評価の保存が成功しました'));
+                if (intval($_GET['biditem_id']) === $buyerstatus_biditem_id) {
+                    $entity = $this->request->getData();
+                    $entity['biditem_id'] = $buyerstatus_biditem_id;
+                    $entity['target'] = $seller;
+                    $entity['rater'] = $this->Auth->user('id');
+                    $entity = $this->Ratings->patchEntity($rating, $entity);
+                    if ($this->Ratings->save($entity)) {
+                        $this->Flash->success(__('評価の保存が成功しました'));
+                        return $this->redirect(['action' => '../auction']);
+                    }
+                    $this->Flash->error(__('評価の保存に失敗しました。'));
+                } else {
                     return $this->redirect(['action' => '../auction']);
                 }
-                $this->Flash->error(__('評価の保存に失敗しました。'));
             }
         }
         $this->set(compact('rating'));
