@@ -283,6 +283,7 @@ class AuctionController extends AuctionBaseController
 		if (false === isset($bidinfo_biditem_id)) {
 			return $this->redirect(['action' => 'index']);
 		}
+
 		// 落札されていなかったら
 		// getの商品idで、すでに落札者情報が入力されていたら
 		$buyer_status = $this->BuyerStatus->find('all')->toArray();
@@ -296,6 +297,9 @@ class AuctionController extends AuctionBaseController
 		$buyerstatus = $this->BuyerStatus->newEntity();
 		// POST送信時の処理
 		if ($this->request->is('post')) {
+			if (intval($_POST["is_received"]) !== 0) { //ここで受け取り完了のチェック
+				return $this->redirect(['action' => 'index']);
+			}
 			if ($bidinfo_biditem_id === intval($_POST["biditem_id"])) { //ここでpostされた値が書き換えられていないかチェック
 				// $buyerstatusにフォームの送信内容を反映
 				$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
