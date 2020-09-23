@@ -177,10 +177,18 @@ class AuctionController extends AuctionBaseController
 		])->toArray();
 		$this->set(compact('bidinfo'));
 		$buyer_status = $this->BuyerStatus->find('all')->toArray(); //出品者
+		$biditem = $this->Biditems->find('all')->toArray(); //商品
 		if ($this->request->is('post')) {
+			for ($j = 0; $j < count($biditem); $j++) {
+				if ($biditem[$j]["id"] === intval($this->request->getData(['buyer']))) {
+					$biditem_is_sent = $biditem[$j]["is_sent"];
+					$biditem_id = $biditem[$j]["id"];
+					break;
+				}
+			}
 			$information = false;
 			for ($i = 0; $i < count($buyer_status); $i++) {
-				if ($buyer_status[$i]["id"] === intval($this->request->getData(['buyer'])) && $buyer_status[$i]["buyer_id"] === $this->Auth->user('id')) {
+				if ($buyer_status[$i]["id"] === $biditem_id && $buyer_status[$i]["buyer_id"] === $this->Auth->user('id') && $biditem_is_sent === true) { //$biditem_is_sentがtrueだったら発送されている
 					$buyer_status_id = $buyer_status[$i]["id"];
 					$is_received = $buyer_status[$i]['is_received'];
 					$information = true;
@@ -297,24 +305,20 @@ class AuctionController extends AuctionBaseController
 		$buyerstatus = $this->BuyerStatus->newEntity();
 		// POST送信時の処理
 		if ($this->request->is('post')) {
-			if ($bidinfo_biditem_id === intval($_GET["biditem_id"])) {
-				// $buyerstatusにフォームの送信内容を反映
-				$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
-				$buyerstatus['biditem_id'] = $bidinfo_biditem_id;
-				$buyerstatus['buyer_id'] = $this->Auth->user('id');
-				$buyerstatus['is_received'] = false;
-				// $buyerstatusを保存する
-				if ($this->BuyerStatus->save($buyerstatus)) {
-					// 成功時のメッセージ
-					$this->Flash->success(__('保存しました。'));
-					// トップページ（index）に移動
-					return $this->redirect(['action' => 'home']);
-				}
-				// 失敗時のメッセージ
-				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
-			} else {
-				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
+			// $buyerstatusにフォームの送信内容を反映
+			$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
+			$buyerstatus['biditem_id'] = $bidinfo_biditem_id;
+			$buyerstatus['buyer_id'] = $this->Auth->user('id');
+			$buyerstatus['is_received'] = false;
+			// $buyerstatusを保存する
+			if ($this->BuyerStatus->save($buyerstatus)) {
+				// 成功時のメッセージ
+				$this->Flash->success(__('保存しました。'));
+				// トップページ（index）に移動
+				return $this->redirect(['action' => 'home']);
 			}
+			// 失敗時のメッセージ
+			$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
 		}
 		// 値を保管
 		$this->set(compact('buyerstatus'));
