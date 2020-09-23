@@ -179,23 +179,24 @@ class AuctionController extends AuctionBaseController
 		$buyer_status = $this->BuyerStatus->find('all')->toArray(); //出品者
 		$biditem = $this->Biditems->find('all')->toArray(); //商品
 		if ($this->request->is('post')) {
-			for ($j = 0; $j < count($biditem); $j++) {
-				if ($biditem[$j]["id"] === intval($this->request->getData(['buyer']))) {
-					$biditem_is_sent = $biditem[$j]["is_sent"];
-					$biditem_id = $biditem[$j]["id"];
-					break;
-				}
-			}
 			$information = false;
 			for ($i = 0; $i < count($buyer_status); $i++) {
-				if ($buyer_status[$i]["id"] === $biditem_id && $buyer_status[$i]["buyer_id"] === $this->Auth->user('id') && $biditem_is_sent === true) { //$biditem_is_sentがtrueだったら発送されている
+				if ($buyer_status[$i]["id"] === intval($this->request->getData(['buyer'])) && $buyer_status[$i]["buyer_id"] === $this->Auth->user('id')) {
+					//$biditem_is_sentがtrueだったら発送されている
 					$buyer_status_id = $buyer_status[$i]["id"];
+					$buyer_status_biditem_id = $buyer_status[$i]["biditem_id"];
 					$is_received = $buyer_status[$i]['is_received'];
 					$information = true;
 					break;
 				}
 			}
-			if ($is_received === false && $information === true) {
+			for ($j = 0; $j < count($biditem); $j++) {
+				if ($biditem[$j]["id"] === $buyer_status_biditem_id) {
+					$biditem_is_sent = $biditem[$j]["is_sent"];
+					break;
+				}
+			}
+			if ($is_received === false && $information === true && $biditem_is_sent === true) {
 				$entity = $this->BuyerStatus->get($buyer_status_id);
 				$this->BuyerStatus->patchEntity($entity, ['is_received' => true]);
 				$this->BuyerStatus->save($entity);
