@@ -3,7 +3,7 @@
 <table cellpadding="0" cellspacing="0">
 	<thead>
 		<tr>
-			<th scope="col"><?= $this->Paginator->sort('id') ?></th>
+			<th scope="col"><?= $this->Paginator->sort('商品id') ?></th>
 			<th class="main" scope="col"><?= $this->Paginator->sort('name') ?></th>
 			<th scope="col"><?= $this->Paginator->sort('created') ?></th>
 			<th scope="col" class="actions"><?= __('Actions') ?></th>
@@ -16,7 +16,7 @@
 	<tbody>
 		<?php foreach ($biditems as $biditem) : ?>
 			<tr>
-				<td><?= h($biditem->bidinfo->id) ?></td>
+				<td><?= h($biditem->id) ?></td>
 				<td><?= h($biditem->name) ?></td>
 				<td><?= h($biditem->created) ?></td>
 				<td class="actions">
