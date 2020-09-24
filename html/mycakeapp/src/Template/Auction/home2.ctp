@@ -16,7 +16,7 @@
 	<tbody>
 		<?php foreach ($biditems as $biditem) : ?>
 			<tr>
-				<td><?= h($biditem->id) ?></td>
+				<td><?= h($biditem->bidinfo->id) ?></td>
 				<td><?= h($biditem->name) ?></td>
 				<td><?= h($biditem->created) ?></td>
 				<td class="actions">
