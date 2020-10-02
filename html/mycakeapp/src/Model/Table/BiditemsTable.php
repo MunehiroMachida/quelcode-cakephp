@@ -79,6 +79,14 @@ class BiditemsTable extends Table
             ->notEmptyString('finished');
 
         $validator
+            ->scalar('information')
+            ->notEmptyString('information');
+
+        $validator
+            ->scalar('image_path')
+            ->notEmptyString('image_path');
+
+        $validator
             ->dateTime('endtime')
             ->requirePresence('endtime', 'create')
             ->notEmptyDateTime('endtime');
