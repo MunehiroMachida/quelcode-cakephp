@@ -8,24 +8,22 @@ use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
 /**
- * Bidinfo Model
+ * Ratings Model
  *
  * @property \App\Model\Table\BiditemsTable&\Cake\ORM\Association\BelongsTo $Biditems
- * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
- * @property \App\Model\Table\BidmessagesTable&\Cake\ORM\Association\HasMany $Bidmessages
  *
- * @method \App\Model\Entity\Bidinfo get($primaryKey, $options = [])
- * @method \App\Model\Entity\Bidinfo newEntity($data = null, array $options = [])
- * @method \App\Model\Entity\Bidinfo[] newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\Bidinfo|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\Bidinfo saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \App\Model\Entity\Bidinfo patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \App\Model\Entity\Bidinfo[] patchEntities($entities, array $data, array $options = [])
- * @method \App\Model\Entity\Bidinfo findOrCreate($search, callable $callback = null, $options = [])
+ * @method \App\Model\Entity\Rating get($primaryKey, $options = [])
+ * @method \App\Model\Entity\Rating newEntity($data = null, array $options = [])
+ * @method \App\Model\Entity\Rating[] newEntities(array $data, array $options = [])
+ * @method \App\Model\Entity\Rating|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \App\Model\Entity\Rating saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \App\Model\Entity\Rating patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \App\Model\Entity\Rating[] patchEntities($entities, array $data, array $options = [])
+ * @method \App\Model\Entity\Rating findOrCreate($search, callable $callback = null, $options = [])
  *
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
-class BidinfoTable extends Table
+class RatingsTable extends Table
 {
     /**
      * Initialize method
@@ -37,7 +35,7 @@ class BidinfoTable extends Table
     {
         parent::initialize($config);
 
-        $this->setTable('bidinfo');
+        $this->setTable('ratings');
         $this->setDisplayField('id');
         $this->setPrimaryKey('id');
 
@@ -48,14 +46,8 @@ class BidinfoTable extends Table
             'joinType' => 'INNER',
         ]);
         $this->belongsTo('Users', [
-            'foreignKey' => 'user_id',
+            'foreignKey' => 'rater',
             'joinType' => 'INNER',
-        ]);
-        $this->hasMany('Bidmessages', [
-            'foreignKey' => 'bidinfo_id',
-        ]);
-        $this->hasMany('Ratings', [
-            'foreignKey' => 'user_id',
         ]);
     }
 
@@ -71,10 +63,28 @@ class BidinfoTable extends Table
             ->integer('id')
             ->allowEmptyString('id', null, 'create');
 
+        // $validator
+        //     ->integer('target')
+        //     ->requirePresence('target', 'create')
+        //     ->notEmptyString('target');
+
         $validator
-            ->integer('price')
-            ->requirePresence('price', 'create')
-            ->notEmptyString('price');
+            ->integer('rater')
+            ->requirePresence('rater', 'create')
+            ->notEmptyString('rater');
+
+        $validator
+            ->integer('score')
+            ->requirePresence('score', 'create')
+            ->notEmptyString('score')
+            ->greaterThan('score', 0)
+            ->lessThanOrEqual('score', 5);
+
+        $validator
+            ->scalar('comment')
+            ->maxLength('comment', 1000)
+            ->requirePresence('comment', 'create')
+            ->notEmptyString('comment');
 
         return $validator;
     }
@@ -89,7 +99,6 @@ class BidinfoTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['biditem_id'], 'Biditems'));
-        $rules->add($rules->existsIn(['user_id'], 'Users'));
 
         return $rules;
     }

@@ -53,6 +53,9 @@ class BiditemsTable extends Table
         $this->hasMany('Bidrequests', [
             'foreignKey' => 'biditem_id',
         ]);
+        $this->hasMany('BuyerStatus', [
+            'foreignKey' => 'id',
+        ]);
     }
 
     /**
@@ -82,6 +85,11 @@ class BiditemsTable extends Table
             ->dateTime('endtime')
             ->requirePresence('endtime', 'create')
             ->notEmptyDateTime('endtime');
+
+        $validator
+            ->boolean('is_sent')
+            ->requirePresence('is_sent', 'create')
+            ->notEmptyString('is_sent');
 
         return $validator;
     }

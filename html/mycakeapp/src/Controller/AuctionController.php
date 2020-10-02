@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Controller\AppController;
@@ -22,6 +23,8 @@ class AuctionController extends AuctionBaseController
 		$this->loadModel('Bidrequests');
 		$this->loadModel('Bidinfo');
 		$this->loadModel('Bidmessages');
+		$this->loadModel('BuyerStatus');
+		$this->loadModel('Ratings');
 		// ログインしているユーザー情報をauthuserに設定
 		$this->set('authuser', $this->Auth->user());
 		// レイアウトをauctionに変更
@@ -33,8 +36,9 @@ class AuctionController extends AuctionBaseController
 	{
 		// ページネーションでBiditemsを取得
 		$auction = $this->paginate('Biditems', [
-			'order' =>['endtime'=>'desc'], 
-			'limit' => 10]);
+			'order' => ['endtime' => 'desc'],
+			'limit' => 10
+		]);
 		$this->set(compact('auction'));
 	}
 
@@ -56,11 +60,12 @@ class AuctionController extends AuctionBaseController
 			$bidinfo->biditem_id = $id;
 			// 最高金額のBidrequestを検索
 			$bidrequest = $this->Bidrequests->find('all', [
-				'conditions'=>['biditem_id'=>$id], 
+				'conditions' => ['biditem_id' => $id],
 				'contain' => ['Users'],
-				'order'=>['price'=>'desc']])->first();
+				'order' => ['price' => 'desc']
+			])->first();
 			// Bidrequestが得られた時の処理
-			if (!empty($bidrequest)){
+			if (!empty($bidrequest)) {
 				// Bidinfoの各種プロパティを設定して保存する
 				$bidinfo->user_id = $bidrequest->user->id;
 				$bidinfo->user = $bidrequest->user;
@@ -68,13 +73,14 @@ class AuctionController extends AuctionBaseController
 				$this->Bidinfo->save($bidinfo);
 			}
 			// Biditemのbidinfoに$bidinfoを設定
-			$biditem->bidinfo = $bidinfo;		
+			$biditem->bidinfo = $bidinfo;
 		}
 		// Bidrequestsからbiditem_idが$idのものを取得
 		$bidrequests = $this->Bidrequests->find('all', [
-			'conditions'=>['biditem_id'=>$id], 
+			'conditions' => ['biditem_id' => $id],
 			'contain' => ['Users'],
-			'order'=>['price'=>'desc']])->toArray();
+			'order' => ['price' => 'desc']
+		])->toArray();
 		// オブジェクト類をテンプレート用に設定
 		$this->set(compact('biditem', 'bidrequests'));
 	}
@@ -119,7 +125,7 @@ class AuctionController extends AuctionBaseController
 				// 成功時のメッセージ
 				$this->Flash->success(__('入札を送信しました。'));
 				// トップページにリダイレクト
-				return $this->redirect(['action'=>'view', $biditem_id]);
+				return $this->redirect(['action' => 'view', $biditem_id]);
 			}
 			// 失敗時のメッセージ
 			$this->Flash->error(__('入札に失敗しました。もう一度入力下さい。'));
@@ -128,7 +134,7 @@ class AuctionController extends AuctionBaseController
 		$biditem = $this->Biditems->get($biditem_id);
 		$this->set(compact('bidrequest', 'biditem'));
 	}
-	
+
 	// 落札者とのメッセージ
 	public function msg($bidinfo_id = null)
 	{
@@ -146,15 +152,16 @@ class AuctionController extends AuctionBaseController
 			}
 		}
 		try { // $bidinfo_idからBidinfoを取得する
-			$bidinfo = $this->Bidinfo->get($bidinfo_id, ['contain'=>['Biditems']]);
-		} catch(Exception $e){
+			$bidinfo = $this->Bidinfo->get($bidinfo_id, ['contain' => ['Biditems']]);
+		} catch (Exception $e) {
 			$bidinfo = null;
 		}
 		// Bidmessageをbidinfo_idとuser_idで検索
-		$bidmsgs = $this->Bidmessages->find('all',[
-			'conditions'=>['bidinfo_id'=>$bidinfo_id],
+		$bidmsgs = $this->Bidmessages->find('all', [
+			'conditions' => ['bidinfo_id' => $bidinfo_id],
 			'contain' => ['Users'],
-			'order'=>['created'=>'desc']]);
+			'order' => ['created' => 'desc']
+		]);
 		$this->set(compact('bidmsgs', 'bidinfo', 'bidmsg'));
 	}
 
@@ -163,11 +170,55 @@ class AuctionController extends AuctionBaseController
 	{
 		// 自分が落札したBidinfoをページネーションで取得
 		$bidinfo = $this->paginate('Bidinfo', [
-			'conditions'=>['Bidinfo.user_id'=>$this->Auth->user('id')], 
+			'conditions' => ['Bidinfo.user_id' => $this->Auth->user('id')],
 			'contain' => ['Users', 'Biditems'],
-			'order'=>['created'=>'desc'],
-			'limit' => 10])->toArray();
+			'order' => ['created' => 'desc'],
+			'limit' => 10
+		])->toArray();
 		$this->set(compact('bidinfo'));
+		$buyer_status = $this->BuyerStatus->find('all')->toArray(); //出品者
+		$biditem = $this->Biditems->find('all')->toArray(); //商品
+		if ($this->request->is('post')) {
+			$information = false;
+			for ($i = 0; $i < count($buyer_status); $i++) {
+				if ($buyer_status[$i]["id"] === intval($this->request->getData(['buyer'])) && $buyer_status[$i]["buyer_id"] === $this->Auth->user('id')) {
+					//$biditem_is_sentがtrueだったら発送されている
+					$buyer_status_id = $buyer_status[$i]["id"];
+					$buyer_status_biditem_id = $buyer_status[$i]["biditem_id"];
+					$is_received = $buyer_status[$i]['is_received'];
+					$information = true;
+					break;
+				}
+			}
+			for ($j = 0; $j < count($biditem); $j++) {
+				if ($biditem[$j]["id"] === $buyer_status_biditem_id) {
+					$biditem_is_sent = $biditem[$j]["is_sent"];
+					break;
+				}
+			}
+			if ($is_received === false && $information === true && $biditem_is_sent === true) {
+				$entity = $this->BuyerStatus->get($buyer_status_id);
+				$this->BuyerStatus->patchEntity($entity, ['is_received' => true]);
+				$this->BuyerStatus->save($entity);
+				if ($this->BuyerStatus->save($entity)) {
+					$bidinfo_array = $this->Bidinfo->find('all')->toArray();
+					for ($i = 0; $i <= count($bidinfo_array); $i++) {
+						if ($bidinfo_array[$i]['biditem_id'] === $entity["biditem_id"]) {
+							$bidinfo_id = $bidinfo_array[$i]['id']; //bidinfoのid
+							break;
+						}
+					}
+					$bidmsg = $this->Bidmessages->newEntity();
+					$bidmsgs = ['bidinfo_id' => $bidinfo_id, 'user_id' => $entity["buyer_id"], 'message' => '落札者が商品を受け取りました'];
+					$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $bidmsgs);
+					// Bidmessageに発送完了を保存
+					$this->Bidmessages->save($bidmsg);
+					return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
+				}
+			}
+		}
+		$ratings = $this->Ratings->find('all')->toArray();
+		$this->set(compact('buyer_status', 'ratings'));
 	}
 
 	// 出品情報の表示
@@ -175,10 +226,128 @@ class AuctionController extends AuctionBaseController
 	{
 		// 自分が出品したBiditemをページネーションで取得
 		$biditems = $this->paginate('Biditems', [
-			'conditions'=>['Biditems.user_id'=>$this->Auth->user('id')], 
+			'conditions' => ['Biditems.user_id' => $this->Auth->user('id')],
 			'contain' => ['Users', 'Bidinfo'],
-			'order'=>['created'=>'desc'],
-			'limit' => 10])->toArray();
+			'order' => ['created' => 'desc'],
+			'limit' => 10
+		])->toArray();
 		$this->set(compact('biditems'));
+
+		$biditems_array = $this->Biditems->find('all')->toArray(); //出品者
+		$buyer_status = $this->BuyerStatus->find('all')->toArray(); //落札者の情報
+		// 出品者を取得
+		if ($this->request->is('post')) {
+			for ($i = 0; $i < count($biditems_array); $i++) {
+				if ($biditems_array[$i]["id"] === intval($this->request->getData(['item'])) && $biditems_array[$i]["user_id"] === $this->Auth->user('id')) {
+					$biditems_id = $biditems_array[$i]['id'];
+					$biditems_is_sent = $biditems_array[$i]['is_sent'];
+					break;
+				}
+			}
+			// 落札者の情報が入力されているか確認
+			$information = false;
+			for ($j = 0; $j < count($buyer_status); $j++) {
+				if ($buyer_status[$j]['biditem_id'] === $biditems_id) {
+					$information = true;
+					break;
+				}
+			}
+			if ($information === true && $biditems_is_sent === false) {
+				$entity = $this->Biditems->get($biditems_id);
+				$this->Biditems->patchEntity($entity, ['is_sent' => true]);
+				$this->Biditems->save($entity);
+				if ($this->Biditems->save($entity)) {
+					$bidinfo_array = $this->Bidinfo->find('all')->toArray();
+					for ($i = 0; $i <= count($bidinfo_array); $i++) {
+						if ($bidinfo_array[$i]['biditem_id'] === $entity["id"]) {
+							$bidinfo_id = $bidinfo_array[$i]['id']; //bidinfoのid
+							break;
+						}
+					}
+					$bidmsg = $this->Bidmessages->newEntity();
+					$bidmsgs = ['bidinfo_id' => $bidinfo_id, 'user_id' => $entity["user_id"], 'message' => '出品者から商品が発送されました。'];
+					$bidmsg = $this->Bidmessages->patchEntity($bidmsg, $bidmsgs);
+					// Bidmessageに発送完了を保存
+					$this->Bidmessages->save($bidmsg);
+					return $this->redirect(['action' => 'msg', $bidinfo_array[$i]['id']]);
+				}
+			}
+		}
+		$ratings = $this->Ratings->find('all')->toArray();
+		$this->set(compact('ratings', 'buyer_status'));
+	}
+	// 落札者情報
+	public function buyerinfo()
+	{
+		// 落札者とログインユーザーが一緒か、商品idが落札の商品idと一緒か==================================
+		$bidinfo = $this->Bidinfo->find('all')->toArray();
+		$countBidinfo = count($bidinfo);
+		for ($j = 0; $j < $countBidinfo; $j++) {
+			//商品idが落札されているかチェック
+			if ($bidinfo[$j]['biditem_id'] === intval($_GET["biditem_id"]) && $bidinfo[$j]['user_id'] === $this->Auth->user('id')) {
+				//ここでログインユーザーが落札したかチェック
+				$bidinfo_biditem_id = $bidinfo[$j]['biditem_id'];
+				break;
+			}
+		}
+		if (false === isset($bidinfo_biditem_id)) {
+			return $this->redirect(['action' => 'index']);
+		}
+		// 落札されていなかったら
+		// getの商品idで、すでに落札者情報が入力されていたら
+		$buyer_status = $this->BuyerStatus->find('all')->toArray();
+		for ($i = 0; $i < count($buyer_status); $i++) {
+			if ($buyer_status[$i]['biditem_id'] === $bidinfo_biditem_id) {
+				return $this->redirect(['action' => 'index']);
+			}
+		}
+		// ========================================================================================
+		// >BuyerStatusインスタンスを用意
+		$buyerstatus = $this->BuyerStatus->newEntity();
+		// POST送信時の処理
+		if ($this->request->is('post')) {
+			// $buyerstatusにフォームの送信内容を反映
+			$buyerstatus = $this->BuyerStatus->patchEntity($buyerstatus, $this->request->getData());
+			$buyerstatus['biditem_id'] = $bidinfo_biditem_id;
+			$buyerstatus['buyer_id'] = $this->Auth->user('id');
+			$buyerstatus['is_received'] = false;
+			// $buyerstatusを保存する
+			if ($this->BuyerStatus->save($buyerstatus)) {
+				// 成功時のメッセージ
+				$this->Flash->success(__('保存しました。'));
+				// トップページ（index）に移動
+				return $this->redirect(['action' => 'home']);
+			}
+			// 失敗時のメッセージ
+			$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
+		}
+		// 値を保管
+		$this->set(compact('buyerstatus'));
+	}
+
+	public function rating()
+	{
+		// 自分が出品したRatingsをページネーションで取得
+		$ratings = $this->paginate('Ratings', [
+			'conditions' => ['Ratings.target' => $this->Auth->user('id')],
+			'contain' => ['Users'],
+			'order' => ['created' => 'desc'],
+			'limit' => 10
+		])->toArray();
+
+		$sum = 0;
+		if (!empty($ratings)) {
+			for ($i = 0; $i < count($ratings); $i++) {
+				if (is_int($ratings[$i]['score'])) {
+					$sum += $ratings[$i]['score'];
+				}
+			}
+			$avg = $sum / count($ratings);
+			$avg = round($avg, 1);
+		} else {
+			$avg = 0;
+		}
+
+		$this->set(compact('ratings', 'avg'));
 	}
 }
