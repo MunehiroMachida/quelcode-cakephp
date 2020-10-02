@@ -90,19 +90,49 @@ class AuctionController extends AuctionBaseController
 	{
 		// Biditemインスタンスを用意
 		$biditem = $this->Biditems->newEntity();
-		// POST送信時の処理
-		if ($this->request->is('post')) {
-			// $biditemにフォームの送信内容を反映
-			$biditem = $this->Biditems->patchEntity($biditem, $this->request->getData());
-			// $biditemを保存する
-			if ($this->Biditems->save($biditem)) {
-				// 成功時のメッセージ
-				$this->Flash->success(__('保存しました。'));
-				// トップページ（index）に移動
-				return $this->redirect(['action' => 'index']);
+
+		$file = $this->request->getData('image_path');
+		$imagepath_3 = substr($file['name'], -3);
+		$imagepath_4 = substr($file['name'], -4);
+
+		$image_last_3 = in_array($imagepath_3, ['jpg', 'JPG', 'png', 'PNG', 'gif', 'GIF',]);
+		$image_last_4 = in_array($imagepath_4, ['jpeg', 'JPEG',]);
+		$biditem_last_id = $this->Biditems->find('all')->last();
+
+		if ($image_last_3 || $image_last_4) {
+			// ====================================================================================
+			if (is_null($biditem_last_id) && $image_last_3) {
+				$file['name'] = ('1' . '.' . $imagepath_3);
+			} elseif (!is_null($biditem_last_id) && $image_last_3) {
+				$file['name'] = ($biditem_last_id['id'] . '.' . $imagepath_3);
+			} elseif (is_null($biditem_last_id) && $image_last_4) {
+				$file['name'] = ('1' . '.' . $imagepath_4);
+			} else {
+				$file['name'] = ($biditem_last_id['id'] . '.' . $imagepath_4);
 			}
-			// 失敗時のメッセージ
-			$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
+			// ====================================================================================
+
+			// POST送信時の処理
+			if ($this->request->is('post')) {
+				// $biditemにフォームの送信内容を反映
+				$biditem = $this->Biditems->patchEntity($biditem, $this->request->getData());
+				$biditem["image_path"] = $file['name'];
+				// $biditemを保存する
+				if ($this->Biditems->save($biditem)) {
+					// 成功時のメッセージ
+					$this->Flash->success(__('保存しました。'));
+					// ====================================================================================
+					$filePath = 'img/auction/' . $file['name'];
+					move_uploaded_file($file['tmp_name'], $filePath);
+					// ====================================================================================
+					// トップページ（index）に移動
+					return $this->redirect(['action' => 'index']);
+				}
+				// 失敗時のメッセージ
+				$this->Flash->error(__('保存に失敗しました。もう一度入力下さい。'));
+			}
+		} elseif(!empty($this->request->getData())) {
+			$this->Flash->error(__('画像ファイルを確認して、もう一度入力下さい。'));
 		}
 		// 値を保管
 		$this->set(compact('biditem'));
